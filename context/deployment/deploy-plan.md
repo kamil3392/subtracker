@@ -8,7 +8,7 @@ first_deploy_at: 2026-09-21T11:21:18Z
 version_id: d8a8b707-bcc5-4b94-ac7d-614ce8756289
 code_version_id: 7d7466cb-ac88-459c-8983-c9f6d368302b
 secrets_wired: [SUPABASE_URL, SUPABASE_KEY]
-ci_deploy: configured-not-active
+ci_deploy: configured-not-active (local git only, no GitHub remote yet)
 plan_approved_at: 2026-09-21
 status: deployed
 verified_at: 2026-10-02
@@ -261,7 +261,7 @@ Runda 3 (2026-10-02, kontrola końcowa agenta po click-through użytkownika):
 
 ## 9. Do zrobienia, żeby CI deployował
 
-1. `git init` w katalogu repo, `npx husky` (brak skryptu `prepare`), pierwszy commit na gałęzi `master`.
+1. ✅ 2026-10-02: `git init -b master`, `npx husky` (hooksPath `.husky/_`), pierwszy commit `f7e9256`. Dodano `.prettierignore` (skille 10x CLI, `context/`, `CLAUDE.md`), żeby hook lint-staged nie przeformatował plików chronionych hashem ani dokumentów agentowych; `*.iml` w `.gitignore`.
 2. Repozytorium na GitHub; push `master`.
 3. GitHub Secrets: `CLOUDFLARE_API_TOKEN` (szablon „Edit Cloudflare Workers”, ograniczony do tego konta, bez DNS/billing/KV — KV niepotrzebne dzięki `session: false`), `CLOUDFLARE_ACCOUNT_ID` = `3e6c96199bd2a36317a753cc7e5f1aca`, oraz `SUPABASE_URL`/`SUPABASE_KEY` dla joba `ci` (build).
 4. Pierwszy push na `master` uruchomi `ci` → `smoke` → `deploy`. PR merge jest bramką ludzką.

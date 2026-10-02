@@ -290,22 +290,22 @@ Migracja czysto addytywna (dwa enumy, jedna tabela) — wstecznie zgodna z obecn
 
 #### Automated
 
-- [x] 2.1 `npx supabase test db` lokalnie: wszystkie asercje przechodzą
-- [x] 2.2 Test jest wrażliwy na regresję: usunięcie `WITH CHECK` lub polityki select wywraca `npx supabase test db` (zmiana tymczasowa, wycofana)
-- [ ] 2.3 `npm run smoke` przeciw lokalnemu dev serverowi nadal przechodzi
+- [x] 2.1 `npx supabase test db` lokalnie: wszystkie asercje przechodzą — c3b400b
+- [x] 2.2 Test jest wrażliwy na regresję: usunięcie `WITH CHECK` lub polityki select wywraca `npx supabase test db` (zmiana tymczasowa, wycofana) — c3b400b
+- [x] 2.3 `npm run smoke` przeciw lokalnemu dev serverowi nadal przechodzi — c3b400b
 
 #### Manual
 
-- [ ] 2.4 Job `smoke` w GitHub Actions jest zielony i wykonuje `supabase test db`
+- [x] 2.4 Job `smoke` w GitHub Actions jest zielony i wykonuje `supabase test db` — c3b400b
 
 ### Phase 3: Typy w aplikacji i dokumentacja
 
 #### Automated
 
-- [ ] 3.1 `npm run db:types` odtwarza `src/db/database.types.ts` bez różnic
-- [ ] 3.2 `npx astro sync && npm run lint` przechodzi
-- [ ] 3.3 `npx astro check` przechodzi
-- [ ] 3.4 `npm run build` przechodzi
+- [x] 3.1 `npm run db:types` odtwarza `src/db/database.types.ts` bez różnic
+- [x] 3.2 `npx astro sync && npm run lint` przechodzi
+- [x] 3.3 `npx astro check` przechodzi
+- [x] 3.4 `npm run build` przechodzi
 
 #### Manual
 

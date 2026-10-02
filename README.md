@@ -56,6 +56,7 @@ npm run dev
 - `npm run lint:fix` - Auto-fix ESLint issues
 - `npm run format` - Run Prettier
 - `npm run smoke` - Smoke test the auth flow against a running server (`BASE_URL`, defaults to `http://localhost:4321`)
+- `npm run db:types` - Regenerate `src/db/database.types.ts` from the local Supabase database
 
 ## Project Structure
 
@@ -112,7 +113,12 @@ npx supabase stop
 
 The local Studio UI is available at `http://localhost:54323`.
 
-No database tables or migrations are required — this project uses Supabase Auth's built-in `auth.users` table only.
+### Database schema, tests and types
+
+- **Migrations** live in `supabase/migrations/` (currently `public.subscriptions` with owner-only RLS). `npx supabase start` applies them; after adding one locally, apply it with `npx supabase migration up`.
+- **Database tests** (pgTAP) live in `supabase/tests/`. Run them against the local stack with `npx supabase test db`.
+- **Types**: `src/db/database.types.ts` is generated from the local database and committed. After changing the schema, run `npm run db:types` and commit the result — do not edit the file by hand (it is excluded from ESLint and Prettier so it stays byte-identical to the CLI output).
+- **CI** runs the database tests in the `smoke` job (see [CI](#ci)).
 
 ### Using a cloud Supabase project instead
 
@@ -181,7 +187,7 @@ It needs a reachable Supabase instance (local or cloud) with email confirmation 
 GitHub Actions runs two jobs on every push and PR to `master`:
 
 - **ci** — lint, `astro check` and build. Configure `SUPABASE_URL` and `SUPABASE_KEY` as repository secrets for the build step.
-- **smoke** — starts a local Supabase via the Supabase CLI, builds, serves the production preview on the Cloudflare runtime and runs `npm run smoke` against it. No secrets required.
+- **smoke** — starts a local Supabase via the Supabase CLI (applying `supabase/migrations/`), runs the pgTAP database tests (`supabase test db`), builds, serves the production preview on the Cloudflare runtime and runs `npm run smoke` against it. No secrets required.
 
 ## License
 

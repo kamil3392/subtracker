@@ -2,7 +2,7 @@
 
 ## Twarde zasady
 
-- Dziś używana jest tylko tabela `auth.users`; `supabase/config.toml` istnieje, `supabase/migrations/` jeszcze nie. Tabele domenowe dodawaj jako migracje `supabase/migrations/YYYYMMDDHHmmss_krotki_opis.sql` i **zawsze** włączaj RLS z osobnymi politykami per operacja (select/insert/update/delete) dla `authenticated` — to jedyny mechanizm realizujący NFR „żaden użytkownik nie widzi subskrypcji innego konta”.
+- Istnieje `public.subscriptions` (migracja w `supabase/migrations/`, RLS owner-only, testy pgTAP w `supabase/tests/`) obok `auth.users`. Kolejne tabele domenowe dodawaj jako migracje `supabase/migrations/YYYYMMDDHHmmss_krotki_opis.sql` i **zawsze** włączaj RLS z osobnymi politykami per operacja (select/insert/update/delete) dla `authenticated` — to jedyny mechanizm realizujący NFR „żaden użytkownik nie widzi subskrypcji innego konta”.
 - `context/archive/` — niezmienne; nic tam nie zapisuj.
 - Sekrety (`SUPABASE_URL`, `SUPABASE_KEY`) są deklarowane w `env.schema` w `astro.config.mjs` jako `context: "server", access: "secret", optional: true`. Importuj je przez `import { SUPABASE_URL } from "astro:env/server"`, **nie** przez `import.meta.env`. Nowa zmienna = nowy wpis w schema.
 - `output: "server"` w `astro.config.mjs` — wszystkie strony są SSR; adapter `@astrojs/cloudflare`, flaga `nodejs_compat` w `wrangler.jsonc`. Kod serwerowy wykonuje się w workerd, nie w Node: z modułów Node używaj wyłącznie tych z listy `nodejs_compat` (https://developers.cloudflare.com/workers/runtime-apis/nodejs/), importowanych z prefiksem `node:`; `child_process`, `worker_threads` i `cluster` nie istnieją w workerd.
@@ -13,11 +13,11 @@
 
 **Subtracker** — aplikacja webowa do śledzenia subskrypcji: sprowadza cykle miesięczne/kwartalne/roczne do jednego kosztu miesięcznego (osobno per waluta) i pokazuje odnowienia w ciągu 30 dni. Zakres produktu (FR-001…FR-010, NFR prywatności, non-goals) definiuje @context/foundation/prd.md; wybór stosu uzasadnia @context/foundation/tech-stack.md.
 
-Kod to świeży scaffold **10x Astro Starter** (Astro 7 SSR + React 19 + Tailwind 4 + Supabase Auth + Cloudflare Workers) z gotowym przepływem auth. Żadna funkcja domenowa Subtrackera (subskrypcje, suma miesięczna, odnowienia) nie jest jeszcze zaimplementowana. `package.json` nadal nazywa się `10x-astro-starter`, a `project_name` w tech-stack.md to `10x-cards` — obie nazwy są pozostałościami; PRD jest źródłem prawdy.
+Kod to świeży scaffold **10x Astro Starter** (Astro 7 SSR + React 19 + Tailwind 4 + Supabase Auth + Cloudflare Workers) z gotowym przepływem auth. Poza schematem `public.subscriptions` żadna funkcja domenowa Subtrackera (subskrypcje, suma miesięczna, odnowienia) nie jest jeszcze zaimplementowana. `package.json` nadal nazywa się `10x-astro-starter`, a `project_name` w tech-stack.md to `10x-cards` — obie nazwy są pozostałościami; PRD jest źródłem prawdy.
 
 - `AGENTS.md` jest dowiązaniem symbolicznym do tego pliku — edytuj wyłącznie `CLAUDE.md`.
 - Oryginalne zasady startera (`CLAUDE.md.scaffold`) zostały wchłonięte do tego pliku i usunięte.
-- Katalog nie jest jeszcze repozytorium git (brak `.git/`), więc konwencji commitów nie da się wywnioskować, a hook pre-commit jest nieaktywny.
+- Repozytorium git (gałąź `master`, remote na GitHubie). Commity w Conventional Commits; dla zmian z `context/changes/` scope to change-id, a temat kończy się indeksem fazy, np. `feat(owner-only-subscription-store): Migracja schematu i RLS (p1)`.
 
 ## Polecenia
 
@@ -28,9 +28,9 @@ Standardowe skrypty (`dev`, `build`, `preview`, `lint`, `format`, `smoke`), loka
 - `npx astro check` sprawdza typy w `.astro` i `.ts`; CI to uruchamia, ale nie ma skryptu npm.
 - `npx shadcn@latest add <name>` dodaje komponent shadcn/ui do `src/components/ui/`.
 
-**Testy**: brak zestawu testów jednostkowych i runnera — nie ma „pojedynczego testu” do uruchomienia. Jedyna automatyczna kontrola to `scripts/smoke.mjs` (przepływ auth po HTTP przeciw **działającemu** serwerowi; wymagania w @README.md). Dodając testy jednostkowe (np. dla przeliczania cykli — guardrail z PRD), wybierz runner i rozszerz `.github/workflows/ci.yml`.
+**Testy**: brak zestawu testów jednostkowych i runnera — nie ma „pojedynczego testu” do uruchomienia. Automatyczne kontrole to testy bazy pgTAP w `supabase/tests/` (`npx supabase test db` przeciw działającemu lokalnemu Supabase; RLS i ograniczenia `public.subscriptions`) oraz `scripts/smoke.mjs` (przepływ auth po HTTP przeciw **działającemu** serwerowi; wymagania w @README.md). Obie uruchamia job `smoke` w CI. Dodając testy jednostkowe (np. dla przeliczania cykli — guardrail z PRD), wybierz runner i rozszerz `.github/workflows/ci.yml`.
 
-**Pre-commit**: husky + lint-staged (konfiguracja w @package.json). `package.json` nie ma skryptu `prepare`, więc po `git init` uruchom `npx husky`, inaczej hook z `.husky/pre-commit` nie zostanie podpięty.
+**Pre-commit**: husky + lint-staged (konfiguracja w @package.json). Hook (`npx lint-staged`: `eslint --fix` dla `ts/tsx/astro`, `prettier --write` dla `json/css/md`) działa w tym checkoucie; `package.json` nie ma skryptu `prepare`, więc na świeżym klonie uruchom `npx husky`, inaczej hook z `.husky/pre-commit` nie zostanie podpięty.
 
 **CI**: @.github/workflows/ci.yml, gałąź `master`, joby `ci` i `smoke` — opis w @README.md.
 
@@ -57,7 +57,8 @@ Standardowe skrypty (`dev`, `build`, `preview`, `lint`, `format`, `smoke`), loka
 
 ### Dane i logika domenowa (do zbudowania)
 
-- Współdzielone typy (encje, DTO) → `src/types.ts`; logika biznesowa (przeliczanie cyklu na koszt miesięczny, sumy per waluta, rollover daty odnowienia z FR-009 liczony przy odczycie) → `src/lib/services/`; hooki React → `src/components/hooks/`.
+- Typy bazy generuje `npm run db:types` do `src/db/database.types.ts` (commitowany, wyłączony z ESLint i Prettier — nie edytuj ręcznie, regeneruj po każdej migracji); klient z `createClient()` jest typowany `Database`.
+- Współdzielone typy (encje, DTO) → `src/types.ts` (już: `Subscription`, `BillingCycle`, `SubscriptionStatus`, wyprowadzone z `Database`); logika biznesowa (przeliczanie cyklu na koszt miesięczny, sumy per waluta, rollover daty odnowienia z FR-009 liczony przy odczycie) → `src/lib/services/`; hooki React → `src/components/hooks/`.
 - Walidacja wejścia na granicach (API, formularze) zod-em. Nie dodawaj `zod` do `package.json` — importuj `z` z `astro:schema` (Astro re-eksportuje zod); jeśli brakuje w nim potrzebnego API, opisz to w PR zamiast instalować pakiet.
 
 ### Lint

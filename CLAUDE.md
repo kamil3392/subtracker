@@ -59,7 +59,7 @@ Standardowe skrypty (`dev`, `build`, `preview`, `lint`, `format`, `smoke`), loka
 
 - Typy bazy generuje `npm run db:types` do `src/db/database.types.ts` (commitowany, wyłączony z ESLint i Prettier — nie edytuj ręcznie, regeneruj po każdej migracji); klient z `createClient()` jest typowany `Database`.
 - Współdzielone typy (encje, DTO) → `src/types.ts` (już: `Subscription`, `BillingCycle`, `SubscriptionStatus`, wyprowadzone z `Database`); logika biznesowa (przeliczanie cyklu na koszt miesięczny, sumy per waluta, rollover daty odnowienia z FR-009 liczony przy odczycie) → `src/lib/services/`; hooki React → `src/components/hooks/`.
-- Walidacja wejścia na granicach (API, formularze) zod-em. Nie dodawaj `zod` do `package.json` — importuj `z` z `astro:schema` (Astro re-eksportuje zod); jeśli brakuje w nim potrzebnego API, opisz to w PR zamiast instalować pakiet.
+- Walidacja wejścia na granicach (API, formularze) zod-em. Nie dodawaj `zod` do `package.json` — importuj `z` z `astro/zod` (Astro re-eksportuje zod v4; `astro:schema` jest deprecated w Astro 7 i nie rozwiązuje się w vitest, a `astro/zod` tak); jeśli brakuje w nim potrzebnego API, opisz to w PR zamiast instalować pakiet.
 
 ### Lint
 

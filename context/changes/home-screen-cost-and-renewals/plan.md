@@ -385,28 +385,28 @@ Migracja grantów jest addytywna względem schematu (bez zmian kolumn i typów) 
 
 #### Automated
 
-- [x] 2.1 `npm test`: wszystkie testy przechodzą
-- [x] 2.2 Testy są wrażliwe na regresję: zamiana kotwicy na liczenie krok po kroku w `nextRenewalDate` albo zaokrąglanie per pozycja w `monthlyCostByCurrency` wywraca `npm test` (zmiana tymczasowa, wycofana)
-- [x] 2.3 `npx astro sync && npm run lint` przechodzi
-- [x] 2.4 `npx astro check` przechodzi
+- [x] 2.1 `npm test`: wszystkie testy przechodzą — 80125d6
+- [x] 2.2 Testy są wrażliwe na regresję: zamiana kotwicy na liczenie krok po kroku w `nextRenewalDate` albo zaokrąglanie per pozycja w `monthlyCostByCurrency` wywraca `npm test` (zmiana tymczasowa, wycofana) — 80125d6
+- [x] 2.3 `npx astro sync && npm run lint` przechodzi — 80125d6
+- [x] 2.4 `npx astro check` przechodzi — 80125d6
 
 #### Manual
 
-- [x] 2.5 Przegląd przypadków testowych względem decyzji: kotwica do dnia, okno [dziś, dziś+30], `Europe/Warsaw`, tylko aktywne
-- [ ] 2.6 Job `ci` w GitHub Actions wykonuje `npm test` i jest zielony
+- [x] 2.5 Przegląd przypadków testowych względem decyzji: kotwica do dnia, okno [dziś, dziś+30], `Europe/Warsaw`, tylko aktywne — 80125d6
+- [x] 2.6 Job `ci` w GitHub Actions wykonuje `npm test` i jest zielony — 80125d6
 
 ### Phase 3: Dodawanie subskrypcji (backend)
 
 #### Automated
 
-- [ ] 3.1 `npm test`: testy schematu i serwisu przechodzą
-- [ ] 3.2 `npx astro sync && npm run lint` przechodzi
-- [ ] 3.3 `npx astro check` przechodzi
-- [ ] 3.4 `npm run build` przechodzi
+- [x] 3.1 `npm test`: testy schematu i serwisu przechodzą
+- [x] 3.2 `npx astro sync && npm run lint` przechodzi
+- [x] 3.3 `npx astro check` przechodzi
+- [x] 3.4 `npm run build` przechodzi
 
 #### Manual
 
-- [ ] 3.5 `curl -X POST` na `/api/subscriptions` bez sesji (dev server) kończy się redirectem na `/auth/signin`, bez zapisu
+- [x] 3.5 `curl -X POST` na `/api/subscriptions` bez sesji (dev server) kończy się redirectem na `/auth/signin`, bez zapisu
 
 ### Phase 4: Ekran główny
 

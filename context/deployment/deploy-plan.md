@@ -5,10 +5,11 @@ worker_name: subtracker
 account_id: 3e6c96199bd2a36317a753cc7e5f1aca
 production_url: https://subtracker.kamil-kapturski.workers.dev
 first_deploy_at: 2026-09-21T11:21:18Z
-version_id: d8a8b707-bcc5-4b94-ac7d-614ce8756289
+version_id: 0f589141-ed1e-4867-9933-ca29579ee24c
 code_version_id: 7d7466cb-ac88-459c-8983-c9f6d368302b
 secrets_wired: [SUPABASE_URL, SUPABASE_KEY]
-ci_deploy: configured-not-active (local git only, no GitHub remote yet)
+ci_deploy: active (github.com/kamil3392/subtracker, push to master)
+ci_first_deploy_version: 0f589141-ed1e-4867-9933-ca29579ee24c
 plan_approved_at: 2026-09-21
 status: deployed
 verified_at: 2026-10-02
@@ -91,6 +92,7 @@ Decyzje użytkownika (2026-09-21):
 | 8 | Weryfikacja automatyczna | agent | patrz §6 | ✅ 13:36 — runda 2 zielona (tabela w §6) |
 | 9 | Weryfikacja ręczna | człowiek | click-through przy `wrangler tail` | ✅ zgłoszone przez użytkownika („gotowe”, 2026-10-02), bez zgłoszonych błędów. Zapis `wrangler tail --status error` **nie zachował się** — sesja agenta zakończyła się przed odczytem, pliki scratch zostały wyczyszczone. Historyczne logi: Workers Logs w panelu (observability włączone). |
 | 10 | Aktualizacja tego pliku (URL, Version ID, sekrety) | agent | — | ✅ 2026-10-02 |
+| 11 | CI deploy end-to-end (push → ci → smoke → deploy) | człowiek (push, sekrety GitHub) + CI | `git push -u origin master` | ✅ 2026-10-02 08:17Z — wersja `0f589141…`, weryfikacja curl po deployu zielona |
 
 ## 5a. Runbook kroków ręcznych (instrukcje do wykonania)
 
@@ -257,14 +259,14 @@ Runda 3 (2026-10-02, kontrola końcowa agenta po click-through użytkownika):
 | Workers Secrets | `SUPABASE_URL`, `SUPABASE_KEY` (wartość: klucz publishable) — ustawione 2026-09-21 13:35, działają bez redeployu |
 | Bindings w konfiguracji | `ASSETS` (dist/client), `IMAGES` (auto z adaptera); brak KV/D1/R2 |
 | Supabase | hostowany projekt podłączony przez Workers Secrets; Site URL / Redirect URLs = adres workers.dev (zgłoszone przez użytkownika); Confirm email włączone; brak tabel domenowych, tylko `auth.users` (w tym konto założone podczas click-through) |
-| CI deploy | job `deploy` w `ci.yml` **skonfigurowany, nieaktywny** — repo nie jest w git ani na GitHub |
+| CI deploy | **aktywny**: push na `master` w `github.com/kamil3392/subtracker` → `ci` → `smoke` → `deploy`. Pierwszy przebieg 2026-10-02 wgrał wersję `0f589141-ed1e-4867-9933-ca29579ee24c` (08:17Z, 100% ruchu); sekrety Workera nietknięte, aplikacja zweryfikowana curl-em po deployu |
 
 ## 9. Do zrobienia, żeby CI deployował
 
 1. ✅ 2026-10-02: `git init -b master`, `npx husky` (hooksPath `.husky/_`), pierwszy commit `f7e9256`. Dodano `.prettierignore` (skille 10x CLI, `context/`, `CLAUDE.md`), żeby hook lint-staged nie przeformatował plików chronionych hashem ani dokumentów agentowych; `*.iml` w `.gitignore`.
-2. Repozytorium na GitHub; push `master`.
-3. GitHub Secrets: `CLOUDFLARE_API_TOKEN` (szablon „Edit Cloudflare Workers”, ograniczony do tego konta, bez DNS/billing/KV — KV niepotrzebne dzięki `session: false`), `CLOUDFLARE_ACCOUNT_ID` = `3e6c96199bd2a36317a753cc7e5f1aca`, oraz `SUPABASE_URL`/`SUPABASE_KEY` dla joba `ci` (build).
-4. Pierwszy push na `master` uruchomi `ci` → `smoke` → `deploy`. PR merge jest bramką ludzką.
+2. ✅ 2026-10-02: repozytorium `https://github.com/kamil3392/subtracker` (remote `origin`, HTTPS), `git push -u origin master` → `7b006d3`. Pułapki po drodze: (a) GitHub nie przyjmuje hasła konta, potrzebny Personal Access Token lub klucz SSH; (b) push commita zawierającego `.github/workflows/ci.yml` wymaga od tokena uprawnienia **workflow** (classic) / **Workflows: Read and write** (fine-grained), inaczej `refusing to allow a Personal Access Token to create or update workflow`.
+3. GitHub Secrets (Settings → Secrets and variables → Actions → Secrets): `CLOUDFLARE_API_TOKEN` (szablon „Edit Cloudflare Workers”, ograniczony do tego konta, bez DNS/billing/KV — KV niepotrzebne dzięki `session: false`), `CLOUDFLARE_ACCOUNT_ID` = `3e6c96199bd2a36317a753cc7e5f1aca`, oraz `SUPABASE_URL`/`SUPABASE_KEY` dla joba `ci` (build).
+4. ✅ 2026-10-02: sekrety ustawione, pierwszy przebieg workflow przeszedł wszystkie trzy joby; `deploy` utworzył wersję `0f589141…` (źródło `version_upload`). PR merge pozostaje bramką ludzką dla kolejnych zmian.
 5. Preview deploye (Workers Builds vs `wrangler versions upload --preview-alias`) dopiero po: Cloudflare Access na `*.workers.dev` previews **i** osobnym projekcie Supabase dla previews. Do tego czasu `preview_urls: false`.
 
 ## 10. Rozbieżności odnotowane

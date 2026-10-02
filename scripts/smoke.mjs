@@ -1,9 +1,10 @@
-// Smoke test: proves the built app, the Cloudflare adapter and the Supabase auth flow still work together.
+// Smoke test: proves the built app, the Cloudflare adapter, the Supabase auth flow and adding a subscription still work together.
 // Zero dependencies on purpose. Run against a live server: BASE_URL=http://localhost:4321 node scripts/smoke.mjs
 
 const BASE_URL = process.env.BASE_URL ?? "http://localhost:4321";
 const email = `smoke-${Date.now()}@example.com`;
 const password = "Smoke-Test-Passw0rd!";
+const subscriptionName = `Smoke Sub ${Date.now()}`;
 const jar = new Map();
 
 function cookieHeader() {
@@ -32,7 +33,7 @@ async function request(path, { method = "GET", form } = {}) {
     body: form ? new URLSearchParams(form).toString() : undefined,
   });
   storeCookies(response);
-  return { status: response.status, location: response.headers.get("location") ?? "" };
+  return { status: response.status, location: response.headers.get("location") ?? "", body: await response.text() };
 }
 
 const steps = [
@@ -51,9 +52,32 @@ const steps = [
   [
     "signin accepts correct password",
     () => request("/api/auth/signin", { method: "POST", form: { email, password } }),
-    { status: 302, location: "/" },
+    { status: 302, location: "/dashboard" },
   ],
   ["dashboard renders for signed-in user", () => request("/dashboard"), { status: 200 }],
+  [
+    "add subscription redirects to dashboard",
+    () =>
+      request("/api/subscriptions", {
+        method: "POST",
+        form: {
+          name: subscriptionName,
+          price: "49.99",
+          currency: "PLN",
+          billing_cycle: "monthly",
+          // Today (UTC): a monthly subscription renewing today is always inside the 30-day renewals list,
+          // which is where the dashboard shows subscription names.
+          next_renewal_date: new Date().toISOString().slice(0, 10),
+        },
+      }),
+    { status: 302, location: "/dashboard", exactLocation: true },
+  ],
+  [
+    "dashboard lists the added subscription",
+    () => request("/dashboard"),
+    { status: 200, bodyIncludes: subscriptionName },
+  ],
+  ["home redirects signed-in user to dashboard", () => request("/"), { status: 302, location: "/dashboard" }],
   ["signout clears session", () => request("/api/auth/signout", { method: "POST" }), { status: 302, location: "/" }],
   ["dashboard redirects after signout", () => request("/dashboard"), { status: 302, location: "/auth/signin" }],
 ];
@@ -61,13 +85,18 @@ const steps = [
 let failed = 0;
 for (const [name, run, expected] of steps) {
   const actual = await run();
-  const ok =
-    actual.status === expected.status &&
-    (expected.location === undefined || actual.location.startsWith(expected.location));
+  const locationOk =
+    expected.location === undefined ||
+    (expected.exactLocation ? actual.location === expected.location : actual.location.startsWith(expected.location));
+  const bodyOk = expected.bodyIncludes === undefined || actual.body.includes(expected.bodyIncludes);
+  const ok = actual.status === expected.status && locationOk && bodyOk;
   console.log(`${ok ? "PASS" : "FAIL"}  ${name}  -> ${actual.status} ${actual.location}`);
   if (!ok) {
     failed++;
-    console.log(`      expected ${expected.status} ${expected.location ?? ""}`);
+    console.log(
+      `      expected ${expected.status} ${expected.location ?? ""}` +
+        (expected.bodyIncludes === undefined ? "" : ` (body includes "${expected.bodyIncludes}")`),
+    );
   }
 }
 

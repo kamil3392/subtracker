@@ -56,7 +56,7 @@ npm run dev
 - `npm run lint:fix` - Auto-fix ESLint issues
 - `npm run format` - Run Prettier
 - `npm run test` - Run the unit tests once (vitest, `src/**/*.test.ts`); a single file: `npx vitest run <path>`
-- `npm run smoke` - Smoke test the auth flow against a running server (`BASE_URL`, defaults to `http://localhost:4321`)
+- `npm run smoke` - Smoke test the auth flow and adding a subscription against a running server (`BASE_URL`, defaults to `http://localhost:4321`)
 - `npm run db:types` - Regenerate `src/db/database.types.ts` from the local Supabase database
 
 ## Project Structure
@@ -147,12 +147,14 @@ Users can then sign in immediately after sign-up without clicking a confirmation
 
 ### Auth routes
 
-| Route                 | Description                                                             |
-| --------------------- | ----------------------------------------------------------------------- |
-| `/auth/signin`        | Email/password sign-in form                                             |
-| `/auth/signup`        | Email/password sign-up form                                             |
-| `/auth/confirm-email` | Post-signup "check your inbox" page                                     |
-| `/dashboard`          | Example protected page (redirects to `/auth/signin` if unauthenticated) |
+| Route                     | Description                                                                                                                    |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `/`                       | Landing page for anonymous visitors; signed-in users are redirected to `/dashboard`                                            |
+| `/auth/signin`            | Email/password sign-in form; on success redirects to `/dashboard`                                                              |
+| `/auth/signup`            | Email/password sign-up form                                                                                                    |
+| `/auth/confirm-email`     | Post-signup "check your inbox" page                                                                                            |
+| `/dashboard`              | Home screen (protected): monthly cost per currency, renewals in the next 30 days and the "add subscription" form               |
+| `POST /api/subscriptions` | Adds a subscription (protected); redirects to `/dashboard`, or to `/dashboard?error=<message>` when validation or saving fails |
 
 Route protection is handled in `src/middleware.ts`. Add paths to the `PROTECTED_ROUTES` array there to require authentication.
 
@@ -172,7 +174,7 @@ Set `SUPABASE_URL` and `SUPABASE_KEY` as Workers Secrets via `npx wrangler secre
 
 ## Smoke test
 
-`scripts/smoke.mjs` is a dependency-free Node script that walks the whole auth flow (sign-up, sign-in, protected page, sign-out) over HTTP. Run it against the dev server or the production preview after dependency upgrades:
+`scripts/smoke.mjs` is a dependency-free Node script that walks the whole auth flow (sign-up, sign-in, protected page, sign-out) and adding a subscription (`POST /api/subscriptions`, then checking that `/dashboard` lists it) over HTTP. Run it against the dev server or the production preview after dependency upgrades:
 
 ```bash
 npm run dev            # or: npm run build && npm run preview

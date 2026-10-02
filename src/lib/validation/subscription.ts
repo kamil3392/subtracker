@@ -1,8 +1,9 @@
 import { z } from "astro/zod";
 
 import { Constants, type TablesInsert } from "@/db/database.types";
+import { SUPPORTED_CURRENCIES } from "@/lib/currencies";
 
-export const SUPPORTED_CURRENCIES = ["PLN", "EUR", "USD", "GBP", "CHF"] as const;
+export { SUPPORTED_CURRENCIES };
 
 /** Up to 8 integer digits and 2 decimal places keeps the value inside `numeric(10,2)` without rounding. */
 const PRICE_PATTERN = /^\d{1,8}([.,]\d{1,2})?$/;

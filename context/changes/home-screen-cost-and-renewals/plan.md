@@ -399,23 +399,23 @@ Migracja grantów jest addytywna względem schematu (bez zmian kolumn i typów) 
 
 #### Automated
 
-- [x] 3.1 `npm test`: testy schematu i serwisu przechodzą
-- [x] 3.2 `npx astro sync && npm run lint` przechodzi
-- [x] 3.3 `npx astro check` przechodzi
-- [x] 3.4 `npm run build` przechodzi
+- [x] 3.1 `npm test`: testy schematu i serwisu przechodzą — 45f5024
+- [x] 3.2 `npx astro sync && npm run lint` przechodzi — 45f5024
+- [x] 3.3 `npx astro check` przechodzi — 45f5024
+- [x] 3.4 `npm run build` przechodzi — 45f5024
 
 #### Manual
 
-- [x] 3.5 `curl -X POST` na `/api/subscriptions` bez sesji (dev server) kończy się redirectem na `/auth/signin`, bez zapisu
+- [x] 3.5 `curl -X POST` na `/api/subscriptions` bez sesji (dev server) kończy się redirectem na `/auth/signin`, bez zapisu — 45f5024
 
 ### Phase 4: Ekran główny
 
 #### Automated
 
-- [ ] 4.1 `npx astro sync && npm run lint` przechodzi
-- [ ] 4.2 `npx astro check` przechodzi
-- [ ] 4.3 `npm test` przechodzi
-- [ ] 4.4 `npm run build` przechodzi
+- [x] 4.1 `npx astro sync && npm run lint` przechodzi
+- [x] 4.2 `npx astro check` przechodzi
+- [x] 4.3 `npm test` przechodzi
+- [x] 4.4 `npm run build` przechodzi
 
 #### Manual
 

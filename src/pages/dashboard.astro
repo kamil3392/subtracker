@@ -1,27 +1,112 @@
 ---
+import Topbar from "@/components/Topbar.astro";
+import AddSubscriptionForm from "@/components/subscriptions/AddSubscriptionForm";
 import Layout from "@/layouts/Layout.astro";
+import { BILLING_CYCLE_LABELS } from "@/lib/currencies";
+import { todayInWarsaw } from "@/lib/services/dates";
+import { monthlyCostByCurrency, upcomingRenewals } from "@/lib/services/subscriptions";
+import { createClient } from "@/lib/supabase";
+import type { Subscription } from "@/types";
 
-const { user } = Astro.locals;
+const error = Astro.url.searchParams.get("error");
+
+let subscriptions: Subscription[] = [];
+let loadError: string | null = null;
+
+const supabase = createClient(Astro.request.headers, Astro.cookies);
+if (!supabase) {
+  loadError = "Supabase is not configured, so subscriptions cannot be loaded.";
+} else {
+  // RLS restricts the select to the signed-in owner's rows.
+  const { data, error: selectError } = await supabase.from("subscriptions").select("*");
+  if (selectError) {
+    loadError = "Could not load your subscriptions. Please try again later.";
+  } else {
+    subscriptions = data;
+  }
+}
+
+const today = todayInWarsaw(new Date());
+const costs = monthlyCostByCurrency(subscriptions);
+const renewals = upcomingRenewals(subscriptions, today);
+const isEmpty = costs.length === 0;
+
+function formatMoney(amount: number, currency: string): string {
+  return new Intl.NumberFormat("pl-PL", { style: "currency", currency }).format(amount);
+}
+
+// Calendar dates are `YYYY-MM-DD`; format them in UTC so no timezone shift moves the day.
+const dateFormat = new Intl.DateTimeFormat("pl-PL", { dateStyle: "long", timeZone: "UTC" });
+function formatDate(date: string): string {
+  return dateFormat.format(new Date(`${date}T00:00:00Z`));
+}
 ---
 
 <Layout title="Dashboard">
-  <div class="bg-cosmic flex min-h-screen items-center justify-center p-4">
-    <div class="rounded-2xl border border-white/10 bg-white/10 p-8 text-center text-white backdrop-blur-xl">
-      <h1 class="mb-4 bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-3xl font-bold text-transparent">
-        Dashboard
-      </h1>
-      <p class="text-blue-100/80">
-        Welcome, <span class="font-semibold text-white">{user?.email}</span>
-      </p>
-      <p class="mt-2 text-sm text-blue-100/50">This page is only for authenticated users.</p>
-      <form method="POST" action="/api/auth/signout" class="mt-6">
-        <button
-          type="submit"
-          class="rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-sm transition-colors hover:bg-white/20"
-        >
-          Sign out
-        </button>
-      </form>
+  <div class="bg-cosmic relative min-h-screen w-full overflow-hidden">
+    <div class="relative z-10 p-4 sm:p-8">
+      <Topbar />
+
+      <div class="mx-auto grid max-w-5xl grid-cols-1 gap-6 py-6 text-white lg:grid-cols-[1fr_22rem]">
+        <div class="space-y-6">
+          <h1 class="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-3xl font-bold text-transparent">
+            Your subscriptions
+          </h1>
+
+          {loadError ? (
+            <p class="rounded-xl border border-red-500/30 bg-red-900/30 px-4 py-3 text-sm text-red-300">{loadError}</p>
+          ) : isEmpty ? (
+            <section class="rounded-2xl border border-white/10 bg-white/10 p-8 text-center backdrop-blur-xl">
+              <h2 class="mb-2 text-lg font-semibold">No subscriptions yet</h2>
+              <p class="text-sm text-blue-100/60">
+                Add your first subscription with the form to see your monthly cost and upcoming renewals.
+              </p>
+            </section>
+          ) : (
+            <>
+              <section>
+                <h2 class="mb-3 text-lg font-semibold">Monthly cost</h2>
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  {costs.map(({ currency, monthlyCents }) => (
+                    <div class="rounded-xl border border-white/10 bg-white/10 p-5 backdrop-blur-xl">
+                      <p class="text-sm text-blue-100/60">{currency} per month</p>
+                      <p class="mt-1 text-2xl font-bold">{formatMoney(monthlyCents / 100, currency)}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              <section>
+                <h2 class="mb-3 text-lg font-semibold">Renewals in the next 30 days</h2>
+                {renewals.length === 0 ? (
+                  <p class="rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-blue-100/60">
+                    No renewals in the next 30 days.
+                  </p>
+                ) : (
+                  <ul class="divide-y divide-white/10 rounded-xl border border-white/10 bg-white/5 backdrop-blur-xl">
+                    {renewals.map(({ subscription, renewalDate }) => (
+                      <li class="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
+                        <div>
+                          <p class="font-medium">{subscription.name}</p>
+                          <p class="text-sm text-blue-100/60">
+                            {formatDate(renewalDate)} · {BILLING_CYCLE_LABELS[subscription.billing_cycle]}
+                          </p>
+                        </div>
+                        <p class="font-semibold">{formatMoney(subscription.price, subscription.currency)}</p>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </section>
+            </>
+          )}
+        </div>
+
+        <section class="h-fit rounded-2xl border border-white/10 bg-white/10 p-6 backdrop-blur-xl">
+          <h2 class="mb-4 text-lg font-semibold">Add subscription</h2>
+          <AddSubscriptionForm serverError={error} client:load />
+        </section>
+      </div>
     </div>
   </div>
 </Layout>

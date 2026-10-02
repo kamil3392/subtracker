@@ -183,7 +183,7 @@ W przeglądarce, w kolejności:
 1. `/` — strona główna bez czerwonego Bannera o Supabase.
 2. `/auth/signup` — zarejestruj konto na własny adres e-mail → przekierowanie na `/auth/confirm-email`.
 3. Kliknij link z e-maila „Confirm your signup” — musi otworzyć adres `workers.dev` (jeśli otwiera `localhost`/`127.0.0.1:3000`, Site URL z kroku 7 jest błędne).
-4. `/auth/signin` — zaloguj się → przekierowanie na `/`.
+4. `/auth/signin` — zaloguj się → przekierowanie na `/dashboard`.
 5. `/dashboard` — renderuje się (200), pokazuje zalogowanego użytkownika.
 6. Wyloguj (formularz POST w topbarze) → `/dashboard` przekierowuje na `/auth/signin`.
 7. Negatywny test: logowanie złym hasłem → `/auth/signin?error=...` z komunikatem.

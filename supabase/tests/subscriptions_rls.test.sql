@@ -7,7 +7,19 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(17);
+select plan(19);
+
+-- privileges, checked as superuser: authenticated gets exactly the four rls-covered
+-- operations, anon nothing — a future grant or a returning truncate fails here.
+select table_privs_are(
+  'public', 'subscriptions', 'anon', array[]::text[],
+  'anon has no privileges on subscriptions'
+);
+
+select table_privs_are(
+  'public', 'subscriptions', 'authenticated', array['SELECT', 'INSERT', 'UPDATE', 'DELETE'],
+  'authenticated has only select, insert, update, delete on subscriptions'
+);
 
 -- fixtures: two accounts, inserted as superuser before switching roles.
 insert into auth.users (id, email)

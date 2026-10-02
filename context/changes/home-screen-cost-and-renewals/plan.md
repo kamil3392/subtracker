@@ -412,21 +412,21 @@ Migracja grantów jest addytywna względem schematu (bez zmian kolumn i typów) 
 
 #### Automated
 
-- [x] 4.1 `npx astro sync && npm run lint` przechodzi
-- [x] 4.2 `npx astro check` przechodzi
-- [x] 4.3 `npm test` przechodzi
-- [x] 4.4 `npm run build` przechodzi
+- [x] 4.1 `npx astro sync && npm run lint` przechodzi — 25526b6
+- [x] 4.2 `npx astro check` przechodzi — 25526b6
+- [x] 4.3 `npm test` przechodzi — 25526b6
+- [x] 4.4 `npm run build` przechodzi — 25526b6
 
 #### Manual
 
-- [ ] 4.5 Job `smoke` w GitHub Actions jest zielony z nowymi krokami
-- [ ] 4.6 Na produkcji (po deployu z CI): nowe konto widzi stan pusty; po dodaniu trzech subskrypcji (miesięczna, kwartalna, roczna; w tym jedna w EUR) suma per waluta i lista odnowień zgadzają się z ręcznym przeliczeniem
-- [ ] 4.7 Błędne dane w formularzu (np. cena `0`) pokazują komunikat bez zapisu
+- [x] 4.5 Job `smoke` w GitHub Actions jest zielony z nowymi krokami — 25526b6
+- [x] 4.6 Na produkcji (po deployu z CI): nowe konto widzi stan pusty; po dodaniu trzech subskrypcji (miesięczna, kwartalna, roczna; w tym jedna w EUR) suma per waluta i lista odnowień zgadzają się z ręcznym przeliczeniem — 25526b6
+- [x] 4.7 Błędne dane w formularzu (np. cena `0`) pokazują komunikat bez zapisu — 25526b6
 
 ### Phase 5: Migracja uprawnień na hostowany Supabase (bramka ręczna)
 
 #### Manual
 
-- [ ] 5.1 `npx supabase migration list` na produkcji pokazuje `restrict_subscriptions_grants` po stronie Remote
-- [ ] 5.2 Anon nadal odrzucany (`42501`), a dodanie subskrypcji przez UI na produkcji działa
-- [ ] 5.3 `context/deployment/deploy-plan.md` zawiera wpis o migracji uprawnień
+- [x] 5.1 `npx supabase migration list` na produkcji pokazuje `restrict_subscriptions_grants` po stronie Remote
+- [x] 5.2 Anon nadal odrzucany (`42501`), a dodanie subskrypcji przez UI na produkcji działa
+- [x] 5.3 `context/deployment/deploy-plan.md` zawiera wpis o migracji uprawnień

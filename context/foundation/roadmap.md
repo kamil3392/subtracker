@@ -42,7 +42,7 @@ Osoby prywatne z wieloma subskrypcjami płacą za usługi, o których zapomniał
 | ID   | Change ID                       | Outcome (user can …)                                                                                  | Prerequisites | PRD refs                                    | Status   |
 | ---- | ------------------------------- | ----------------------------------------------------------------------------------------------------- | ------------- | ------------------------------------------- | -------- |
 | F-01 | owner-only-subscription-store   | (foundation) magazyn subskrypcji istnieje i każde konto widzi wyłącznie własne wpisy                  | —             | NFR prywatności, Access Control             | done |
-| S-01 | home-screen-cost-and-renewals   | dodać subskrypcje i na ekranie głównym zobaczyć koszt miesięczny per waluta oraz odnowienia w 30 dni | F-01          | US-01, FR-001, FR-002, FR-003, FR-008, FR-009 | proposed |
+| S-01 | home-screen-cost-and-renewals   | dodać subskrypcje i na ekranie głównym zobaczyć koszt miesięczny per waluta oraz odnowienia w 30 dni | F-01          | US-01, FR-001, FR-002, FR-003, FR-008, FR-009 | in-progress |
 | S-02 | subscription-list-and-edit      | przeglądać listę własnych subskrypcji i poprawić dowolny wpis                                        | S-01          | FR-004, FR-005                              | proposed |
 | S-03 | subscription-delete-and-cancel  | usunąć błędny wpis lub oznaczyć subskrypcję jako anulowaną, z poprawnym wpływem na sumę i odnowienia | S-01          | FR-006, FR-007, US-01                       | proposed |
 
@@ -96,7 +96,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
   - Jak przesuwać datę odnowienia, gdy dzień nie istnieje w kolejnym miesiącu (np. 31 → luty)? — Owner: user. Block: no.
   - Czy okno „w ciągu 30 dni” obejmuje dzisiejszą datę i dzień 30.? — Owner: user. Block: no.
 - **Risk:** Niesie barierę jakości z PRD („błędna suma niszczy zaufanie”), więc przeliczanie cykli i przesuwanie dat odnowień muszą mieć tu automatyczne testy — to pierwszy wycinek, który ich potrzebuje; FR-001/FR-002 są już w kodzie i są tu jedynie weryfikowane w pełnym przepływie (rejestracja → ekran główny).
-- **Status:** proposed
+- **Status:** in-progress
 
 ### S-02: Lista i edycja subskrypcji
 

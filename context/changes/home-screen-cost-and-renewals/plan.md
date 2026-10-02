@@ -372,27 +372,27 @@ Migracja grantów jest addytywna względem schematu (bez zmian kolumn i typów) 
 
 #### Automated
 
-- [x] 1.1 Migracja stosuje się lokalnie: `npx supabase migration up` kończy się bez błędów
-- [x] 1.2 `npx supabase test db`: wszystkie asercje przechodzą
-- [x] 1.3 Test wykrywa regresję: tymczasowy `grant truncate on public.subscriptions to authenticated` wywraca `npx supabase test db` (zmiana wycofana)
-- [x] 1.4 `npm run db:types` nie zmienia `src/db/database.types.ts`
+- [x] 1.1 Migracja stosuje się lokalnie: `npx supabase migration up` kończy się bez błędów — fe66a68
+- [x] 1.2 `npx supabase test db`: wszystkie asercje przechodzą — fe66a68
+- [x] 1.3 Test wykrywa regresję: tymczasowy `grant truncate on public.subscriptions to authenticated` wywraca `npx supabase test db` (zmiana wycofana) — fe66a68
+- [x] 1.4 `npm run db:types` nie zmienia `src/db/database.types.ts` — fe66a68
 
 #### Manual
 
-- [x] 1.5 Przegląd SQL: tylko revoke/grant, brak zmian w politykach
+- [x] 1.5 Przegląd SQL: tylko revoke/grant, brak zmian w politykach — fe66a68
 
 ### Phase 2: Serwis domenowy i runner testów
 
 #### Automated
 
-- [ ] 2.1 `npm test`: wszystkie testy przechodzą
-- [ ] 2.2 Testy są wrażliwe na regresję: zamiana kotwicy na liczenie krok po kroku w `nextRenewalDate` albo zaokrąglanie per pozycja w `monthlyCostByCurrency` wywraca `npm test` (zmiana tymczasowa, wycofana)
-- [ ] 2.3 `npx astro sync && npm run lint` przechodzi
-- [ ] 2.4 `npx astro check` przechodzi
+- [x] 2.1 `npm test`: wszystkie testy przechodzą
+- [x] 2.2 Testy są wrażliwe na regresję: zamiana kotwicy na liczenie krok po kroku w `nextRenewalDate` albo zaokrąglanie per pozycja w `monthlyCostByCurrency` wywraca `npm test` (zmiana tymczasowa, wycofana)
+- [x] 2.3 `npx astro sync && npm run lint` przechodzi
+- [x] 2.4 `npx astro check` przechodzi
 
 #### Manual
 
-- [ ] 2.5 Przegląd przypadków testowych względem decyzji: kotwica do dnia, okno [dziś, dziś+30], `Europe/Warsaw`, tylko aktywne
+- [x] 2.5 Przegląd przypadków testowych względem decyzji: kotwica do dnia, okno [dziś, dziś+30], `Europe/Warsaw`, tylko aktywne
 - [ ] 2.6 Job `ci` w GitHub Actions wykonuje `npm test` i jest zielony
 
 ### Phase 3: Dodawanie subskrypcji (backend)

@@ -11,6 +11,7 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "smoke": "node scripts/smoke.mjs",
+    "test": "vitest run",
     "db:types": "supabase gen types typescript --local > src/db/database.types.ts"
   },
   "dependencies": {
@@ -53,6 +54,7 @@
     "supabase": "^2.23.4",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.70.0",
+    "vitest": "^5.0.3",
     "wrangler": "4.135.0"
   },
   "lint-staged": {

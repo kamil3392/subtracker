@@ -1,7 +1,7 @@
 ---
 change_id: owner-only-subscription-store
 title: Magazyn subskrypcji z izolacją danych per konto
-status: implementing
+status: implemented
 created: 2026-10-02
 updated: 2026-10-02
 archived_at: null

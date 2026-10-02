@@ -315,6 +315,6 @@ Migracja czysto addytywna (dwa enumy, jedna tabela) — wstecznie zgodna z obecn
 
 #### Manual
 
-- [x] 4.1 `npx supabase migration list` na produkcji pokazuje migrację `create_subscriptions` po stronie Remote
-- [x] 4.2 Zapytanie anon do `/rest/v1/subscriptions` na produkcji jest odrzucane
-- [x] 4.3 `context/deployment/deploy-plan.md` zawiera wpis o migracji i zasadę ręcznego `db push`
+- [x] 4.1 `npx supabase migration list` na produkcji pokazuje migrację `create_subscriptions` po stronie Remote — 2cc59da
+- [x] 4.2 Zapytanie anon do `/rest/v1/subscriptions` na produkcji jest odrzucane — 2cc59da
+- [x] 4.3 `context/deployment/deploy-plan.md` zawiera wpis o migracji i zasadę ręcznego `db push` — 2cc59da

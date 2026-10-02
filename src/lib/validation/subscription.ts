@@ -1,6 +1,7 @@
 import { z } from "astro/zod";
 
 import { Constants, type TablesInsert } from "@/db/database.types";
+import { RENEWAL_DATE_MAX, RENEWAL_DATE_MIN } from "@/lib/services/dates";
 import { SUPPORTED_CURRENCIES } from "@/lib/currencies";
 
 export { SUPPORTED_CURRENCIES };
@@ -22,7 +23,11 @@ const newSubscriptionSchema = z.object({
     .refine((value) => value > 0, { error: "Price must be greater than 0" }),
   currency: z.enum(SUPPORTED_CURRENCIES, { error: "Unsupported currency" }),
   billing_cycle: z.enum(Constants.public.Enums.billing_cycle, { error: "Unsupported billing cycle" }),
-  next_renewal_date: z.iso.date({ error: "Next renewal date must be a valid date (YYYY-MM-DD)" }),
+  next_renewal_date: z.iso
+    .date({ error: "Next renewal date must be a valid date (YYYY-MM-DD)" })
+    .refine((value) => value >= RENEWAL_DATE_MIN && value <= RENEWAL_DATE_MAX, {
+      error: `Next renewal date must be between ${RENEWAL_DATE_MIN} and ${RENEWAL_DATE_MAX}`,
+    }),
 });
 
 export type NewSubscription = Omit<TablesInsert<"subscriptions">, "user_id" | "status">;

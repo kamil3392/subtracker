@@ -65,8 +65,10 @@ const steps = [
           price: "49.99",
           currency: "PLN",
           billing_cycle: "monthly",
-          // Today (UTC): a monthly subscription renewing today is always inside the 30-day renewals list,
-          // which is where the dashboard shows subscription names.
+          // Today's UTC date. Usually that is also today in Europe/Warsaw (the app's "today"), so the
+          // subscription renews today. Around 22:00–24:00 UTC it is already "yesterday" in Warsaw; the
+          // monthly rollover then moves it to base + 1 month, which is still ≤ Warsaw today + 30 days.
+          // Either way it lands in the 30-day renewals list, which is where the dashboard shows names.
           next_renewal_date: new Date().toISOString().slice(0, 10),
         },
       }),

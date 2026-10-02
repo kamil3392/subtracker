@@ -132,6 +132,14 @@ describe("parseNewSubscription", () => {
       expect(parseNewSubscription(form({ next_renewal_date: "2028-02-29" })).success).toBe(true);
     });
 
+    it("rejects dates outside the 2000-01-01 … 2099-12-31 range", () => {
+      expect(parseNewSubscription(form({ next_renewal_date: "2000-01-01" })).success).toBe(true);
+      expect(parseNewSubscription(form({ next_renewal_date: "2099-12-31" })).success).toBe(true);
+      expectError(form({ next_renewal_date: "1999-12-31" }));
+      expectError(form({ next_renewal_date: "0100-01-01" }));
+      expectError(form({ next_renewal_date: "2100-01-01" }));
+    });
+
     it("rejects dates that do not exist in the calendar", () => {
       expectError(form({ next_renewal_date: "2026-02-30" }));
       expectError(form({ next_renewal_date: "2026-02-29" }));

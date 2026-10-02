@@ -5,6 +5,7 @@ import { SubmitButton } from "@/components/auth/SubmitButton";
 import { ServerError } from "@/components/auth/ServerError";
 import { Constants } from "@/db/database.types";
 import { BILLING_CYCLE_LABELS, SUPPORTED_CURRENCIES } from "@/lib/currencies";
+import { RENEWAL_DATE_MAX, RENEWAL_DATE_MIN } from "@/lib/services/dates";
 import type { BillingCycle } from "@/types";
 
 // Mirrors the server-side rules in `src/lib/validation/subscription.ts` without importing zod into the client bundle.
@@ -62,6 +63,8 @@ export default function AddSubscriptionForm({ serverError }: Props) {
       next.next_renewal_date = "Next renewal date is required";
     } else if (!isCalendarDate(nextRenewalDate)) {
       next.next_renewal_date = "Next renewal date must be a valid date (YYYY-MM-DD)";
+    } else if (nextRenewalDate < RENEWAL_DATE_MIN || nextRenewalDate > RENEWAL_DATE_MAX) {
+      next.next_renewal_date = `Next renewal date must be between ${RENEWAL_DATE_MIN} and ${RENEWAL_DATE_MAX}`;
     }
 
     setErrors(next);

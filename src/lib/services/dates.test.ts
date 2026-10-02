@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { addDays, addMonthsClamped, todayInWarsaw } from "./dates";
+import { addDays, addMonthsClamped, monthsBetween, todayInWarsaw } from "./dates";
 
 describe("todayInWarsaw", () => {
   it("returns the Warsaw date when it is already past midnight in Poland but not in UTC", () => {
@@ -61,5 +61,13 @@ describe("addDays", () => {
     expect(addDays("2026-03-28", 1)).toBe("2026-03-29");
     expect(addDays("2026-03-29", 1)).toBe("2026-03-30");
     expect(addDays("2026-10-25", 1)).toBe("2026-10-26");
+  });
+});
+
+describe("monthsBetween", () => {
+  it("counts calendar months, ignoring the day of month", () => {
+    expect(monthsBetween("2026-01-31", "2026-04-01")).toBe(3);
+    expect(monthsBetween("2025-11-15", "2026-02-10")).toBe(3);
+    expect(monthsBetween("2026-10-02", "2026-10-30")).toBe(0);
   });
 });

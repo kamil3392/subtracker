@@ -1,6 +1,6 @@
 import type { BillingCycle, Subscription } from "@/types";
 
-import { addDays, addMonthsClamped } from "./dates";
+import { addDays, addMonthsClamped, monthsBetween } from "./dates";
 
 /** Length of each billing cycle in months. */
 export const CYCLE_MONTHS: Record<BillingCycle, 1 | 3 | 12> = {
@@ -30,8 +30,10 @@ export function nextRenewalDate(base: string, cycle: BillingCycle, today: string
     return base;
   }
   const step = CYCLE_MONTHS[cycle];
-  let k = 1;
-  let candidate = addMonthsClamped(base, step);
+  // Jump straight to the first cycle that reaches today's month (O(1) for any base date), then
+  // correct for a base day later than today's day; the loop runs at most once or twice.
+  let k = Math.max(1, Math.ceil(monthsBetween(base, today) / step));
+  let candidate = addMonthsClamped(base, k * step);
   while (candidate < today) {
     k += 1;
     candidate = addMonthsClamped(base, k * step);

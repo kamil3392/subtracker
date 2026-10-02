@@ -51,6 +51,11 @@ describe("nextRenewalDate", () => {
     expect(nextRenewalDate("2020-05-10", "yearly", "2026-10-02")).toBe("2027-05-10");
   });
 
+  it("rolls a very old base date over in constant time, keeping the anchor day", () => {
+    expect(nextRenewalDate("0100-01-31", "monthly", "2026-10-02")).toBe("2026-10-31");
+    expect(nextRenewalDate("2000-01-15", "quarterly", "2026-10-16")).toBe("2027-01-15");
+  });
+
   it("clamps a yearly 29.02 base in common years and restores it in leap years", () => {
     expect(nextRenewalDate("2024-02-29", "yearly", "2025-01-01")).toBe("2025-02-28");
     expect(nextRenewalDate("2024-02-29", "yearly", "2027-03-01")).toBe("2028-02-29");

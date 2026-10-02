@@ -7,6 +7,10 @@
 
 const DATE_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
 
+/** Accepted range for a subscription's renewal date (form and server validation). */
+export const RENEWAL_DATE_MIN = "2000-01-01";
+export const RENEWAL_DATE_MAX = "2099-12-31";
+
 const warsawDateFormat = new Intl.DateTimeFormat("en-CA", {
   timeZone: "Europe/Warsaw",
   year: "numeric",
@@ -54,6 +58,13 @@ export function addMonthsClamped(date: string, months: number): string {
     month: targetMonth,
     day: Math.min(day, daysInMonth(targetYear, targetMonth)),
   });
+}
+
+/** Whole calendar months from `from` to `to`, ignoring the day of month (e.g. 2026-01-31 → 2026-04-01 is 3). */
+export function monthsBetween(from: string, to: string): number {
+  const a = parseDate(from);
+  const b = parseDate(to);
+  return (b.year - a.year) * 12 + (b.month - a.month);
 }
 
 /** Adds (or, with a negative value, subtracts) calendar days. */

@@ -1,7 +1,7 @@
 ---
 change_id: home-screen-cost-and-renewals
 title: Home screen cost and renewals
-status: implementing
+status: implemented
 created: 2026-10-02
 updated: 2026-10-02
 archived_at: null

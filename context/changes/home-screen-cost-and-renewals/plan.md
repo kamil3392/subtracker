@@ -427,6 +427,6 @@ Migracja grantów jest addytywna względem schematu (bez zmian kolumn i typów) 
 
 #### Manual
 
-- [x] 5.1 `npx supabase migration list` na produkcji pokazuje `restrict_subscriptions_grants` po stronie Remote
-- [x] 5.2 Anon nadal odrzucany (`42501`), a dodanie subskrypcji przez UI na produkcji działa
-- [x] 5.3 `context/deployment/deploy-plan.md` zawiera wpis o migracji uprawnień
+- [x] 5.1 `npx supabase migration list` na produkcji pokazuje `restrict_subscriptions_grants` po stronie Remote — fa25b43
+- [x] 5.2 Anon nadal odrzucany (`42501`), a dodanie subskrypcji przez UI na produkcji działa — fa25b43
+- [x] 5.3 `context/deployment/deploy-plan.md` zawiera wpis o migracji uprawnień — fa25b43

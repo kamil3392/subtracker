@@ -1,0 +1,6 @@
+# Course-managed skills (hash-locked in skills-lock.json) and agent-written docs keep their own formatting.
+.claude/
+.agents/
+context/
+CLAUDE.md
+AGENTS.md

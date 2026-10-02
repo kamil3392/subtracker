@@ -302,19 +302,19 @@ Migracja czysto addytywna (dwa enumy, jedna tabela) — wstecznie zgodna z obecn
 
 #### Automated
 
-- [x] 3.1 `npm run db:types` odtwarza `src/db/database.types.ts` bez różnic
-- [x] 3.2 `npx astro sync && npm run lint` przechodzi
-- [x] 3.3 `npx astro check` przechodzi
-- [x] 3.4 `npm run build` przechodzi
+- [x] 3.1 `npm run db:types` odtwarza `src/db/database.types.ts` bez różnic — bc86177
+- [x] 3.2 `npx astro sync && npm run lint` przechodzi — bc86177
+- [x] 3.3 `npx astro check` przechodzi — bc86177
+- [x] 3.4 `npm run build` przechodzi — bc86177
 
 #### Manual
 
-- [ ] 3.5 README i CLAUDE.md nie zawierają już twierdzenia, że migracji/tabel domenowych nie ma
+- [x] 3.5 README i CLAUDE.md nie zawierają już twierdzenia, że migracji/tabel domenowych nie ma — bc86177
 
 ### Phase 4: Migracja na hostowany Supabase (bramka ręczna)
 
 #### Manual
 
-- [ ] 4.1 `npx supabase migration list` na produkcji pokazuje migrację `create_subscriptions` po stronie Remote
-- [ ] 4.2 Zapytanie anon do `/rest/v1/subscriptions` na produkcji jest odrzucane
-- [ ] 4.3 `context/deployment/deploy-plan.md` zawiera wpis o migracji i zasadę ręcznego `db push`
+- [x] 4.1 `npx supabase migration list` na produkcji pokazuje migrację `create_subscriptions` po stronie Remote
+- [x] 4.2 Zapytanie anon do `/rest/v1/subscriptions` na produkcji jest odrzucane
+- [x] 4.3 `context/deployment/deploy-plan.md` zawiera wpis o migracji i zasadę ręcznego `db push`

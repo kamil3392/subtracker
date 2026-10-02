@@ -258,7 +258,7 @@ Runda 3 (2026-10-02, kontrola końcowa agenta po click-through użytkownika):
 | Worker `subtracker` | **wdrożony i zweryfikowany**, `https://subtracker.kamil-kapturski.workers.dev`. Aktywna wersja `d8a8b707-bcc5-4b94-ac7d-614ce8756289` (11:30Z, Secret Change) = kod z `7d7466cb-ac88-459c-8983-c9f6d368302b` (11:21Z, upload) + oba sekrety. Historia: `2ff8d00a…`, `01d79bdb…` (11:15Z) placeholder z kreatora; `ee46191b…` (11:27Z) pierwszy Secret Change. Worker `10x-astro-starter` nie istnieje. |
 | Workers Secrets | `SUPABASE_URL`, `SUPABASE_KEY` (wartość: klucz publishable) — ustawione 2026-09-21 13:35, działają bez redeployu |
 | Bindings w konfiguracji | `ASSETS` (dist/client), `IMAGES` (auto z adaptera); brak KV/D1/R2 |
-| Supabase | hostowany projekt podłączony przez Workers Secrets; Site URL / Redirect URLs = adres workers.dev (zgłoszone przez użytkownika); Confirm email włączone; brak tabel domenowych, tylko `auth.users` (w tym konto założone podczas click-through) |
+| Supabase | hostowany projekt podłączony przez Workers Secrets; Site URL / Redirect URLs = adres workers.dev (zgłoszone przez użytkownika); Confirm email włączone; schemat: `auth.users` + `public.subscriptions` (migracja `20261002091205_create_subscriptions`, RLS owner-only z politykami select/insert/update/delete dla `authenticated`, `anon` bez uprawnień) — zastosowana 2026-10-02 przez `supabase db push`, patrz §12 |
 | CI deploy | **aktywny**: push na `master` w `github.com/kamil3392/subtracker` → `ci` → `smoke` → `deploy`. Pierwszy przebieg 2026-10-02 wgrał wersję `0f589141-ed1e-4867-9933-ca29579ee24c` (08:17Z, 100% ruchu); sekrety Workera nietknięte, aplikacja zweryfikowana curl-em po deployu |
 
 ## 9. Do zrobienia, żeby CI deployował
@@ -281,4 +281,25 @@ Runda 3 (2026-10-02, kontrola końcowa agenta po click-through użytkownika):
 
 ## 11. Poza zakresem
 
-Custom domain/DNS, Cloudflare Access, Workers Paid, `site` w `astro.config.mjs` (sitemapa; wymaga znanej subdomeny), migracje `supabase/migrations/`, aktualizacja `.nvmrc`.
+Custom domain/DNS, Cloudflare Access, Workers Paid, `site` w `astro.config.mjs` (sitemapa; wymaga znanej subdomeny), aktualizacja `.nvmrc`. (Migracje `supabase/migrations/` przeszły do zakresu — §12.)
+
+## 12. Migracje bazy (hostowany Supabase)
+
+**Zasada:** każda nowa migracja w `supabase/migrations/` wymaga ręcznego `npx supabase db push` na produkcję **przed** merge zmiany, która z niej korzysta. CI nie wykonuje `db push` (brak sekretów bazy w GitHub); job `smoke` stosuje migracje tylko na lokalnym, efemerycznym Supabase i uruchamia na nim testy pgTAP. Rollback Workera nie cofa migracji — migracje muszą być addytywne / wstecznie zgodne (risk register w `infrastructure.md`).
+
+Procedura (człowiek, osobny terminal — `login` i `link` są interaktywne, hasło bazy nie trafia do rozmowy):
+
+```bash
+cd ~/10xdevs/10xdevs && nvm use 22
+npx supabase login                          # jednorazowo
+npx supabase link --project-ref <ref>       # jednorazowo na checkout; pyta o hasło bazy
+npx supabase db push --dry-run              # oczekiwane: tylko nowe migracje
+npx supabase db push
+npx supabase migration list                 # Local = Remote dla każdej migracji
+```
+
+Historia:
+
+| Data | Migracja | Wynik |
+|---|---|---|
+| 2026-10-02 | `20261002091205_create_subscriptions.sql` (change `owner-only-subscription-store`, commit `a7d8989`) | `db push`: zastosowana tylko ta migracja; `migration list`: Local `20261002091205` = Remote `20261002091205` (09:12:05 UTC). Sprawdzenie anon `GET /rest/v1/subscriptions?select=id` z kluczem publishable: `HTTP 401`, `{"code":"42501","message":"permission denied for table subscriptions"}` — anon odrzucony na poziomie uprawnień tabeli (`revoke all … from anon`), nie przez zły klucz |

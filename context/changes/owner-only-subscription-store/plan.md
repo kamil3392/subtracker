@@ -278,20 +278,20 @@ Migracja czysto addytywna (dwa enumy, jedna tabela) — wstecznie zgodna z obecn
 
 #### Automated
 
-- [x] 1.1 Migracja stosuje się na czystej bazie: `npx supabase db reset` kończy się bez błędów
-- [x] 1.2 `npm run lint` przechodzi
-- [x] 1.3 `npx astro check` przechodzi
+- [x] 1.1 Migracja stosuje się na czystej bazie: `npx supabase db reset` kończy się bez błędów — a7d8989
+- [x] 1.2 `npm run lint` przechodzi — a7d8989
+- [x] 1.3 `npx astro check` przechodzi — a7d8989
 
 #### Manual
 
-- [x] 1.4 Przegląd SQL migracji: cztery polityki, update z `USING` i `WITH CHECK`, `revoke` dla `anon`, wszystkie CHECK obecne
+- [x] 1.4 Przegląd SQL migracji: cztery polityki, update z `USING` i `WITH CHECK`, `revoke` dla `anon`, wszystkie CHECK obecne — a7d8989
 
 ### Phase 2: Testy izolacji pgTAP i CI
 
 #### Automated
 
-- [ ] 2.1 `npx supabase test db` lokalnie: wszystkie asercje przechodzą
-- [ ] 2.2 Test jest wrażliwy na regresję: usunięcie `WITH CHECK` lub polityki select wywraca `npx supabase test db` (zmiana tymczasowa, wycofana)
+- [x] 2.1 `npx supabase test db` lokalnie: wszystkie asercje przechodzą
+- [x] 2.2 Test jest wrażliwy na regresję: usunięcie `WITH CHECK` lub polityki select wywraca `npx supabase test db` (zmiana tymczasowa, wycofana)
 - [ ] 2.3 `npm run smoke` przeciw lokalnemu dev serverowi nadal przechodzi
 
 #### Manual

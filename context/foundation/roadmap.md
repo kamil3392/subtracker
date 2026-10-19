@@ -43,7 +43,7 @@ Osoby prywatne z wieloma subskrypcjami płacą za usługi, o których zapomniał
 | ---- | ------------------------------- | ----------------------------------------------------------------------------------------------------- | ------------- | ------------------------------------------- | -------- |
 | F-01 | owner-only-subscription-store   | (foundation) magazyn subskrypcji istnieje i każde konto widzi wyłącznie własne wpisy                  | —             | NFR prywatności, Access Control             | done |
 | S-01 | home-screen-cost-and-renewals   | dodać subskrypcje i na ekranie głównym zobaczyć koszt miesięczny per waluta oraz odnowienia w 30 dni | F-01          | US-01, FR-001, FR-002, FR-003, FR-008, FR-009 | done |
-| S-02 | subscription-list-and-edit      | przeglądać listę własnych subskrypcji i poprawić dowolny wpis                                        | S-01          | FR-004, FR-005                              | in-progress |
+| S-02 | subscription-list-and-edit      | przeglądać listę własnych subskrypcji i poprawić dowolny wpis                                        | S-01          | FR-004, FR-005                              | done |
 | S-03 | subscription-delete-and-cancel  | usunąć błędny wpis lub oznaczyć subskrypcję jako anulowaną, z poprawnym wpływem na sumę i odnowienia | S-01          | FR-006, FR-007, US-01                       | proposed |
 
 ## Streams
@@ -108,7 +108,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Zamyka krok 4 przepływu MVP z PRD; po S-01, bo edycja bez wpisów i bez widocznego efektu na sumie nie daje sprawdzalnego wyniku.
-- **Status:** in-progress
+- **Status:** done
 
 ### S-03: Usuwanie i anulowanie subskrypcji
 
@@ -155,3 +155,4 @@ Brak przekrojowych pytań na dzień 2026-10-02 (PRD §Open Questions: brak otwar
 
 - **F-01: (foundation) trwały magazyn subskrypcji istnieje z polami wymaganymi przez FR-003 i FR-007 (nazwa, cena, waluta, cykl, data następnego odnowienia, status), a baza sama wymusza, że każde konto czyta, dodaje, zmienia i usuwa wyłącznie własne wpisy; osoba niezalogowana nie widzi niczego.** — Archived 2026-10-02 → `context/archive/2026-10-02-owner-only-subscription-store/`. Lesson: —.
 - **S-01: użytkownik po zalogowaniu trafia na ekran główny, dodaje subskrypcje o różnych cyklach i walutach, i widzi łączny uśredniony koszt miesięczny osobno dla każdej waluty (roczna = 1/12, kwartalna = 1/3) oraz listę subskrypcji odnawiających się w ciągu 30 dni, z datami odnowień automatycznie przesuwanymi o cykl po ich minięciu; bez subskrypcji widzi czytelny stan pusty.** — Archived 2026-10-02 → `context/archive/2026-10-02-home-screen-cost-and-renewals/`. Lesson: —.
+- **S-02: użytkownik przegląda listę wszystkich własnych subskrypcji i edytuje dowolną z nich (np. cenę lub datę), a suma i odnowienia na ekranie głównym od razu to odzwierciedlają.** — Archived 2026-10-19 → `context/archive/2026-10-19-subscription-list-and-edit/`. Lesson: —.

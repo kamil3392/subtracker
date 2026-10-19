@@ -49,7 +49,7 @@ export const POST: APIRoute = async (context) => {
 
   const { name, price, currency, billing_cycle, next_renewal_date } = parsed.data;
   // Never `user_id` or `status`: the edit form changes only these five fields.
-  const { error: updateError } = await supabase
+  const { data: updated, error: updateError } = await supabase
     .from("subscriptions")
     .update({
       name,
@@ -58,9 +58,14 @@ export const POST: APIRoute = async (context) => {
       billing_cycle,
       next_renewal_date: renewalDateToStore(existing, { next_renewal_date, billing_cycle }, todayInWarsaw(new Date())),
     })
-    .eq("id", id);
+    .eq("id", id)
+    .select("id");
   if (updateError) {
     return context.redirect(formErrorLocation(editPath, "Could not save the subscription", form));
+  }
+  // The row can disappear between the select and the update; an update touching 0 rows is not a success.
+  if (updated.length === 0) {
+    return redirectToDashboardWithError(context, NOT_FOUND);
   }
 
   return context.redirect("/dashboard");

@@ -105,6 +105,14 @@ describe("renewalDateToStore", () => {
       "2026-11-15",
     );
   });
+
+  it("stores the submitted date when both the date and the cycle changed", () => {
+    const stored = { next_renewal_date: "2026-08-15", billing_cycle: "monthly" as const };
+
+    expect(renewalDateToStore(stored, { next_renewal_date: "2026-12-01", billing_cycle: "quarterly" }, today)).toBe(
+      "2026-12-01",
+    );
+  });
 });
 
 describe("upcomingRenewals", () => {

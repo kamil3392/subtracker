@@ -125,6 +125,8 @@ const steps = [
     () => request("/dashboard"),
     { status: 200, bodyIncludes: renamedSubscriptionName },
   ],
+  // Prices render via Intl pl-PL ("59,99 zł"); the original 49.99 never produces this substring.
+  ["dashboard shows the edited price", () => request("/dashboard"), { status: 200, bodyIncludes: "59,99" }],
   [
     "edit of an unknown subscription is rejected",
     () =>

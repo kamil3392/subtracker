@@ -2,6 +2,7 @@ import type { HTMLAttributes, ReactNode } from "react";
 import { CircleAlert } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 
 interface FormFieldProps {
   id: string;
@@ -32,8 +33,10 @@ export function FormField({
   icon,
   endContent,
 }: FormFieldProps) {
-  // The message id links the field to its error for screen readers (aria-describedby); absent without an error.
+  // The message id links the field to its error (or, without one, its hint) for screen readers via aria-describedby.
   const errorId = `${id}-error`;
+  const hintId = `${id}-hint`;
+  const describedBy = error ? errorId : hint ? hintId : undefined;
 
   return (
     <div>
@@ -53,8 +56,9 @@ export function FormField({
           }}
           placeholder={placeholder}
           aria-invalid={error ? true : undefined}
-          aria-describedby={error ? errorId : undefined}
-          className="pl-10"
+          aria-describedby={describedBy}
+          // Right padding keeps typed text clear of an end control such as the password toggle.
+          className={cn("pl-10", endContent && "pr-10")}
         />
         {endContent}
       </div>
@@ -63,9 +67,9 @@ export function FormField({
           <CircleAlert className="size-3" aria-hidden="true" />
           {error}
         </p>
-      ) : (
-        hint
-      )}
+      ) : hint ? (
+        <div id={hintId}>{hint}</div>
+      ) : null}
     </div>
   );
 }

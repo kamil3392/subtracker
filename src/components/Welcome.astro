@@ -1,4 +1,5 @@
 ---
+import { CalendarClock, Lock, Wallet } from "lucide-react";
 import Topbar from "@/components/Topbar.astro";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,9 +11,10 @@ import { Card, CardContent } from "@/components/ui/card";
 
     <!-- Hero section -->
     <div class="mx-auto flex max-w-4xl flex-col items-center justify-center px-4 py-24 text-center sm:py-32 lg:py-40">
-      <h1 class="mb-6 text-5xl leading-tight font-bold text-foreground sm:text-6xl lg:text-7xl">10x Astro Starter</h1>
+      <h1 class="mb-6 text-5xl leading-tight font-bold text-foreground sm:text-6xl lg:text-7xl">SUBTRACKER</h1>
       <p class="mb-10 max-w-2xl text-lg text-muted-foreground sm:text-xl">
-        A production-ready starter with authentication, modern tooling, and a cosmic developer experience.
+        All your subscriptions in one place: monthly, quarterly and yearly charges turned into one real monthly cost,
+        with every renewal coming up in the next 30 days.
       </p>
       <div class="flex flex-col gap-4 sm:flex-row">
         <a href="/auth/signin" class:list={buttonVariants({ size: "lg" })}>
@@ -28,73 +30,30 @@ import { Card, CardContent } from "@/components/ui/card";
     <div class="mx-auto grid max-w-4xl grid-cols-1 gap-6 px-4 pb-24 sm:grid-cols-3">
       <Card>
         <CardContent>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="mb-4 text-primary"
-          >
-            <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-          </svg>
-          <h3 class="mb-2 text-lg font-semibold text-foreground">Authentication Ready</h3>
+          <Wallet className="mb-4 size-6 text-primary" aria-hidden="true" />
+          <h3 class="mb-2 text-lg font-semibold text-foreground">Real monthly cost</h3>
           <p class="text-sm leading-relaxed text-muted-foreground">
-            Built-in Supabase auth with sign in, sign up, and protected routes out of the box.
+            Every billing cycle is converted to a monthly amount and summed separately for each currency.
           </p>
         </CardContent>
       </Card>
 
       <Card>
         <CardContent>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="mb-4 text-primary"
-          >
-            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-            <polyline points="2 17 12 22 22 17"></polyline>
-            <polyline points="2 12 12 17 22 12"></polyline>
-          </svg>
-          <h3 class="mb-2 text-lg font-semibold text-foreground">Modern Stack</h3>
+          <CalendarClock className="mb-4 size-6 text-primary" aria-hidden="true" />
+          <h3 class="mb-2 text-lg font-semibold text-foreground">Upcoming renewals</h3>
           <p class="text-sm leading-relaxed text-muted-foreground">
-            Astro 7, React 19, Tailwind 4, and TypeScript — the latest tools, ready to go.
+            See what renews in the next 30 days before the charge hits your card statement.
           </p>
         </CardContent>
       </Card>
 
       <Card>
         <CardContent>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="mb-4 text-primary"
-          >
-            <polyline points="16 18 22 12 16 6"></polyline>
-            <polyline points="8 6 2 12 8 18"></polyline>
-          </svg>
-          <h3 class="mb-2 text-lg font-semibold text-foreground">Developer Experience</h3>
+          <Lock className="mb-4 size-6 text-primary" aria-hidden="true" />
+          <h3 class="mb-2 text-lg font-semibold text-foreground">Private by default</h3>
           <p class="text-sm leading-relaxed text-muted-foreground">
-            ESLint, Prettier, and pre-commit hooks keep your codebase clean from day one.
+            Your subscriptions are visible only to your account — no one else can see them.
           </p>
         </CardContent>
       </Card>

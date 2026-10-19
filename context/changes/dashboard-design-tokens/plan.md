@@ -434,26 +434,26 @@ Brak danych do migracji. Wycofanie = revert commitów zmiany; commity faz 3–4 
 
 #### Automated
 
-- [x] 1.1 Pliki `src/components/ui/{card,input,label,alert}.tsx` istnieją
-- [x] 1.2 `grep -rn "@radix-ui/" src` nie zwraca trafień
-- [x] 1.3 Lint przechodzi: `npm run lint`
-- [x] 1.4 Typy przechodzą: `npx astro check`
-- [x] 1.5 Testy przechodzą: `npm test`
-- [x] 1.6 Build przechodzi: `npm run build`
+- [x] 1.1 Pliki `src/components/ui/{card,input,label,alert}.tsx` istnieją — 031905a
+- [x] 1.2 `grep -rn "@radix-ui/" src` nie zwraca trafień — 031905a
+- [x] 1.3 Lint przechodzi: `npm run lint` — 031905a
+- [x] 1.4 Typy przechodzą: `npx astro check` — 031905a
+- [x] 1.5 Testy przechodzą: `npm test` — 031905a
+- [x] 1.6 Build przechodzi: `npm run build` — 031905a
 
 #### Manual
 
-- [x] 1.7 `/auth/signin` w `npm run dev` wygląda tak samo jak przed fazą
+- [x] 1.7 `/auth/signin` w `npm run dev` wygląda tak samo jak przed fazą — 031905a
 
 ### Phase 2: Wartości tokenów
 
 #### Automated
 
-- [ ] 2.1 `grep -nE '#[0-9a-fA-F]{3,8}\b' src/components/Banner.astro` nie zwraca trafień
-- [ ] 2.2 `grep -rnE 'ring-(ring|destructive)/[0-9]+' src/components/ui` nie zwraca trafień dla wariantów `focus-visible:`
-- [ ] 2.3 Lint przechodzi: `npm run lint`
-- [ ] 2.4 Typy przechodzą: `npx astro check`
-- [ ] 2.5 Build przechodzi: `npm run build`
+- [x] 2.1 `grep -nE '#[0-9a-fA-F]{3,8}\b' src/components/Banner.astro` nie zwraca trafień
+- [x] 2.2 `grep -rnE 'ring-(ring|destructive)/[0-9]+' src/components/ui` nie zwraca trafień dla wariantów `focus-visible:`
+- [x] 2.3 Lint przechodzi: `npm run lint`
+- [x] 2.4 Typy przechodzą: `npx astro check`
+- [x] 2.5 Build przechodzi: `npm run build`
 
 #### Manual
 

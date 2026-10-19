@@ -41,6 +41,25 @@ export function nextRenewalDate(base: string, cycle: BillingCycle, today: string
   return candidate;
 }
 
+/**
+ * Which base date to store when an existing subscription is edited. The edit form shows the
+ * rolled-over date, so the stored base is kept if and only if the submitted date equals the
+ * rolled-over date of the stored base AND the cycle is unchanged — otherwise an edit that touches
+ * only the price would move the anchor day (31.01 shown as 28.02 would become 28.02 for good).
+ * In every other case the submitted date becomes the new base.
+ */
+export function renewalDateToStore(
+  stored: Pick<Subscription, "next_renewal_date" | "billing_cycle">,
+  submitted: { next_renewal_date: string; billing_cycle: BillingCycle },
+  today: string,
+): string {
+  const shown = nextRenewalDate(stored.next_renewal_date, stored.billing_cycle, today);
+  if (submitted.next_renewal_date === shown && submitted.billing_cycle === stored.billing_cycle) {
+    return stored.next_renewal_date;
+  }
+  return submitted.next_renewal_date;
+}
+
 function isActive(subscription: Subscription): boolean {
   return subscription.status === "active";
 }

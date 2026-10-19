@@ -3,7 +3,7 @@ project: Subtracker
 version: 1
 status: draft                    # draft | active | locked
 created: 2026-10-02
-updated: 2026-10-02
+updated: 2026-10-19
 prd_version: 1
 main_goal: speed
 top_blocker: time
@@ -43,7 +43,7 @@ Osoby prywatne z wieloma subskrypcjami płacą za usługi, o których zapomniał
 | ---- | ------------------------------- | ----------------------------------------------------------------------------------------------------- | ------------- | ------------------------------------------- | -------- |
 | F-01 | owner-only-subscription-store   | (foundation) magazyn subskrypcji istnieje i każde konto widzi wyłącznie własne wpisy                  | —             | NFR prywatności, Access Control             | done |
 | S-01 | home-screen-cost-and-renewals   | dodać subskrypcje i na ekranie głównym zobaczyć koszt miesięczny per waluta oraz odnowienia w 30 dni | F-01          | US-01, FR-001, FR-002, FR-003, FR-008, FR-009 | done |
-| S-02 | subscription-list-and-edit      | przeglądać listę własnych subskrypcji i poprawić dowolny wpis                                        | S-01          | FR-004, FR-005                              | proposed |
+| S-02 | subscription-list-and-edit      | przeglądać listę własnych subskrypcji i poprawić dowolny wpis                                        | S-01          | FR-004, FR-005                              | in-progress |
 | S-03 | subscription-delete-and-cancel  | usunąć błędny wpis lub oznaczyć subskrypcję jako anulowaną, z poprawnym wpływem na sumę i odnowienia | S-01          | FR-006, FR-007, US-01                       | proposed |
 
 ## Streams
@@ -108,7 +108,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Zamyka krok 4 przepływu MVP z PRD; po S-01, bo edycja bez wpisów i bez widocznego efektu na sumie nie daje sprawdzalnego wyniku.
-- **Status:** proposed
+- **Status:** in-progress
 
 ### S-03: Usuwanie i anulowanie subskrypcji
 

@@ -6,3 +6,12 @@ export type Subscription = Tables<"subscriptions">;
 export type BillingCycle = Enums<"billing_cycle">;
 
 export type SubscriptionStatus = Enums<"subscription_status">;
+
+/** Raw values of the subscription form fields, carried through an error redirect and back into the form. */
+export interface SubscriptionFormValues {
+  name: string;
+  price: string;
+  currency: string;
+  billing_cycle: string;
+  next_renewal_date: string;
+}

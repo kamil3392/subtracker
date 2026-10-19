@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { BillingCycle, Subscription, SubscriptionStatus } from "@/types";
 
-import { monthlyCostByCurrency, nextRenewalDate, upcomingRenewals } from "./subscriptions";
+import { monthlyCostByCurrency, nextRenewalDate, renewalDateToStore, upcomingRenewals } from "./subscriptions";
 
 let nextId = 0;
 
@@ -59,6 +59,51 @@ describe("nextRenewalDate", () => {
   it("clamps a yearly 29.02 base in common years and restores it in leap years", () => {
     expect(nextRenewalDate("2024-02-29", "yearly", "2025-01-01")).toBe("2025-02-28");
     expect(nextRenewalDate("2024-02-29", "yearly", "2027-03-01")).toBe("2028-02-29");
+  });
+});
+
+describe("renewalDateToStore", () => {
+  const today = "2026-10-19";
+
+  it("keeps a future base date when neither date nor cycle changed", () => {
+    const stored = { next_renewal_date: "2026-11-20", billing_cycle: "monthly" as const };
+
+    expect(renewalDateToStore(stored, { next_renewal_date: "2026-11-20", billing_cycle: "monthly" }, today)).toBe(
+      "2026-11-20",
+    );
+  });
+
+  it("keeps a past base date when the submitted date is its rolled-over date and the cycle is unchanged", () => {
+    const stored = { next_renewal_date: "2026-08-15", billing_cycle: "monthly" as const };
+
+    expect(renewalDateToStore(stored, { next_renewal_date: "2026-11-15", billing_cycle: "monthly" }, today)).toBe(
+      "2026-08-15",
+    );
+  });
+
+  it("keeps the 31.01 anchor when the form shows the clamped 28.02", () => {
+    const stored = { next_renewal_date: "2026-01-31", billing_cycle: "monthly" as const };
+
+    expect(nextRenewalDate(stored.next_renewal_date, stored.billing_cycle, "2026-02-10")).toBe("2026-02-28");
+    expect(
+      renewalDateToStore(stored, { next_renewal_date: "2026-02-28", billing_cycle: "monthly" }, "2026-02-10"),
+    ).toBe("2026-01-31");
+  });
+
+  it("stores the submitted date when the date changed", () => {
+    const stored = { next_renewal_date: "2026-08-15", billing_cycle: "monthly" as const };
+
+    expect(renewalDateToStore(stored, { next_renewal_date: "2026-11-20", billing_cycle: "monthly" }, today)).toBe(
+      "2026-11-20",
+    );
+  });
+
+  it("stores the submitted date when only the cycle changed", () => {
+    const stored = { next_renewal_date: "2026-08-15", billing_cycle: "monthly" as const };
+
+    expect(renewalDateToStore(stored, { next_renewal_date: "2026-11-15", billing_cycle: "yearly" }, today)).toBe(
+      "2026-11-15",
+    );
   });
 });
 

@@ -50,3 +50,15 @@ export function parseNewSubscription(form: FormData): ParseNewSubscriptionResult
 
   return { success: true, data: result.data };
 }
+
+const subscriptionIdSchema = z.uuid();
+
+/**
+ * Validates the `[id]` route parameter before it reaches a query (Postgres would otherwise fail the
+ * uuid cast instead of reporting "not found"). Returns the id, or `null` when it is missing or not a
+ * UUID. The value is not trimmed: a route parameter with surrounding whitespace is rejected.
+ */
+export function parseSubscriptionId(value: string | undefined): string | null {
+  const result = subscriptionIdSchema.safeParse(value);
+  return result.success ? result.data : null;
+}

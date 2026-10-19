@@ -31,6 +31,8 @@ Standardowe skrypty (`dev`, `build`, `preview`, `lint`, `format`, `test`, `smoke
 
 **Testy**: testy jednostkowe na vitest (`vitest.config.ts`: środowisko `node`, alias `@`) leżą obok kodu jako `src/**/*.test.ts` i importują `describe`/`it`/`expect` jawnie z `vitest` (bez globals); pliki testów są lintowane type-aware jak reszta `src/`. Wszystkie: `npm test`; pojedynczy plik: `npx vitest run <ścieżka>`. Job `ci` uruchamia `npm test` po `npm run lint`. Poza tym testy bazy pgTAP w `supabase/tests/` (`npx supabase test db` przeciw działającemu lokalnemu Supabase; RLS i ograniczenia `public.subscriptions`) oraz `scripts/smoke.mjs` (przepływ auth, dodanie subskrypcji z jej widocznością na `/dashboard`, jej edycja, anulowanie i usunięcie — w tym 404/redirect dla obcego id, po HTTP przeciw **działającemu** serwerowi; wymagania w @README.md) — obie uruchamia job `smoke` w CI.
 
+**Hooki agenta** (`.claude/settings.json` → `.claude/hooks/`): po każdym `Write|Edit` eslint + `check-ui-literals` dla edytowanego pliku i `vitest related`; na `Stop` eslint/literały dla zmienionych plików, `vitest run` i `astro check`, z jednym ponowieniem. Sygnał to exit 2 + stderr; skrypty same ładują nvm (Node 22). Zmiana hooka = zaktualizuj `scripts/__tests__/agent-hooks.test.ts` (część `npm test`).
+
 **Pre-commit**: husky + lint-staged (konfiguracja w @package.json). Hook (`npx lint-staged`: `eslint --fix` dla `ts/tsx/astro`, `prettier --write` dla `json/css/md`) działa w tym checkoucie; `package.json` nie ma skryptu `prepare`, więc na świeżym klonie uruchom `npx husky`, inaczej hook z `.husky/pre-commit` nie zostanie podpięty.
 
 **CI**: @.github/workflows/ci.yml, gałąź `master`, joby `ci` i `smoke` — opis w @README.md.

@@ -306,8 +306,8 @@ Brak migracji schematu. Istniejące wiersze `cancelled` (nieosiągalne z UI prze
 
 #### Manual
 
-- [ ] 1.4 Anulowana z D = dziś liczy się w sumie i odnowieniach („won't renew”, „Cancelled · ends …”); z D = wczoraj znika z obu („Cancelled · ended …”)
-- [ ] 1.5 Konto z samymi anulowanymi po dacie końca widzi listę i komunikat w sekcji kosztu, a nie stan pusty
+- [x] 1.4 Anulowana z D = dziś liczy się w sumie i odnowieniach („won't renew”, „Cancelled · ends …”); z D = wczoraj znika z obu („Cancelled · ended …”)
+- [x] 1.5 Konto z samymi anulowanymi po dacie końca widzi listę i komunikat w sekcji kosztu, a nie stan pusty
 
 ### Phase 2: Endpointy cancel i delete
 
@@ -316,13 +316,13 @@ Brak migracji schematu. Istniejące wiersze `cancelled` (nieosiągalne z UI prze
 - [x] 2.1 Testy jednostkowe przechodzą: `npm test` — 0df0711
 - [x] 2.2 Lint przechodzi: `npm run lint` — 0df0711
 - [x] 2.3 Typy przechodzą: `npx astro check` — 0df0711
-- [ ] 2.4 Smoke przechodzi w CI (job `smoke`) lub lokalnie przeciw działającemu serwerowi
+- [x] 2.4 Smoke przechodzi w CI (job `smoke`) lub lokalnie przeciw działającemu serwerowi
 
 #### Manual
 
-- [ ] 2.5 Cancel zamraża D = najbliższe odnowienie ≥ dziś; ponowny cancel nie zmienia D
-- [ ] 2.6 Cancel/delete na id innego konta daje baner „Subscription not found”, wiersz drugiego konta nietknięty
-- [ ] 2.7 Błąd walidacji formularza „Add” nadal w formularzu z zachowanymi wartościami, nie w banerze
+- [x] 2.5 Cancel zamraża D = najbliższe odnowienie ≥ dziś; ponowny cancel nie zmienia D
+- [x] 2.6 Cancel/delete na id innego konta daje baner „Subscription not found”, wiersz drugiego konta nietknięty
+- [x] 2.7 Błąd walidacji formularza „Add” nadal w formularzu z zachowanymi wartościami, nie w banerze
 
 ### Phase 3: Akcje w UI z potwierdzeniem
 
@@ -332,11 +332,11 @@ Brak migracji schematu. Istniejące wiersze `cancelled` (nieosiągalne z UI prze
 - [x] 3.2 Lint przechodzi: `npm run lint` — efe05d8
 - [x] 3.3 Typy przechodzą: `npx astro check` — efe05d8
 - [x] 3.4 Build przechodzi: `npm run build` — efe05d8
-- [ ] 3.5 Smoke przechodzi w CI (job `smoke`)
+- [x] 3.5 Smoke przechodzi w CI (job `smoke`)
 
 #### Manual
 
-- [ ] 3.6 „Cancel” otwiera dialog; zamknięcie nic nie zmienia; potwierdzenie anuluje wpis, który zostaje z etykietą i traci przycisk „Cancel”
-- [ ] 3.7 „Delete” z potwierdzeniem usuwa wpis ze wszystkich sekcji; anulowanie dialogu nic nie zmienia
-- [ ] 3.8 Wiersz z przyciskami mieści się bez poziomego przewijania przy ~375 px
-- [ ] 3.9 Pełny przepływ MVP z PRD działa na produkcji po deployu
+- [x] 3.6 „Cancel” otwiera dialog; zamknięcie nic nie zmienia; potwierdzenie anuluje wpis, który zostaje z etykietą i traci przycisk „Cancel”
+- [x] 3.7 „Delete” z potwierdzeniem usuwa wpis ze wszystkich sekcji; anulowanie dialogu nic nie zmienia
+- [x] 3.8 Wiersz z przyciskami mieści się bez poziomego przewijania przy ~375 px
+- [x] 3.9 Pełny przepływ MVP z PRD działa na produkcji po deployu

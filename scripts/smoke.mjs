@@ -1,5 +1,5 @@
-// Smoke test: proves the built app, the Cloudflare adapter, the Supabase auth flow and adding and editing a subscription
-// still work together.
+// Smoke test: proves the built app, the Cloudflare adapter, the Supabase auth flow and adding, editing, cancelling and
+// deleting a subscription still work together.
 // Zero dependencies on purpose. Run against a live server: BASE_URL=http://localhost:4321 node scripts/smoke.mjs
 
 import { randomUUID } from "node:crypto";
@@ -143,12 +143,48 @@ const steps = [
     { status: 302, location: "/dashboard?error=" },
   ],
   ["edit page of an unknown subscription is 404", () => request(`/subscriptions/${foreignId}/edit`), { status: 404 }],
+  [
+    "cancel subscription redirects to dashboard",
+    withSubscriptionId((id) => request(`/api/subscriptions/${id}/cancel`, { method: "POST" })),
+    { status: 302, location: "/dashboard", exactLocation: true },
+  ],
+  // The end date is the renewal date due on the day of cancelling (≥ today), so the entry still counts: "ends", not "ended".
+  [
+    "dashboard shows the cancelled subscription",
+    () => request("/dashboard"),
+    { status: 200, bodyIncludes: "Cancelled · ends" },
+  ],
+  [
+    "cancel of an unknown subscription is rejected",
+    () => request(`/api/subscriptions/${foreignId}/cancel`, { method: "POST" }),
+    { status: 302, location: "/dashboard?error=" },
+  ],
+  [
+    "delete subscription redirects to dashboard",
+    withSubscriptionId((id) => request(`/api/subscriptions/${id}/delete`, { method: "POST" })),
+    { status: 302, location: "/dashboard", exactLocation: true },
+  ],
+  [
+    "dashboard no longer lists the deleted subscription",
+    () => request("/dashboard"),
+    { status: 200, bodyExcludes: renamedSubscriptionName },
+  ],
+  [
+    "delete of an unknown subscription is rejected",
+    () => request(`/api/subscriptions/${foreignId}/delete`, { method: "POST" }),
+    { status: 302, location: "/dashboard?error=" },
+  ],
   ["home redirects signed-in user to dashboard", () => request("/"), { status: 302, location: "/dashboard" }],
   ["signout clears session", () => request("/api/auth/signout", { method: "POST" }), { status: 302, location: "/" }],
   ["dashboard redirects after signout", () => request("/dashboard"), { status: 302, location: "/auth/signin" }],
   [
     "edit page redirects after signout",
     withSubscriptionId((id) => request(`/subscriptions/${id}/edit`)),
+    { status: 302, location: "/auth/signin" },
+  ],
+  [
+    "cancel redirects after signout",
+    () => request(`/api/subscriptions/${foreignId}/cancel`, { method: "POST" }),
     { status: 302, location: "/auth/signin" },
   ],
 ];
@@ -159,14 +195,17 @@ for (const [name, run, expected] of steps) {
   const locationOk =
     expected.location === undefined ||
     (expected.exactLocation ? actual.location === expected.location : actual.location.startsWith(expected.location));
-  const bodyOk = expected.bodyIncludes === undefined || actual.body.includes(expected.bodyIncludes);
+  const bodyOk =
+    (expected.bodyIncludes === undefined || actual.body.includes(expected.bodyIncludes)) &&
+    (expected.bodyExcludes === undefined || !actual.body.includes(expected.bodyExcludes));
   const ok = actual.status === expected.status && locationOk && bodyOk;
   console.log(`${ok ? "PASS" : "FAIL"}  ${name}  -> ${actual.status} ${actual.location}`);
   if (!ok) {
     failed++;
     console.log(
       `      expected ${expected.status} ${expected.location ?? ""}` +
-        (expected.bodyIncludes === undefined ? "" : ` (body includes "${expected.bodyIncludes}")`),
+        (expected.bodyIncludes === undefined ? "" : ` (body includes "${expected.bodyIncludes}")`) +
+        (expected.bodyExcludes === undefined ? "" : ` (body excludes "${expected.bodyExcludes}")`),
     );
   }
 }

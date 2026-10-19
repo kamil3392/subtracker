@@ -1,15 +1,10 @@
 import type { APIRoute } from "astro";
+import { NOT_FOUND, redirectToDashboardWithError } from "@/lib/api-redirects";
 import { todayInWarsaw } from "@/lib/services/dates";
 import { renewalDateToStore } from "@/lib/services/subscriptions";
 import { formErrorLocation } from "@/lib/subscription-form";
 import { createClient } from "@/lib/supabase";
 import { parseNewSubscription, parseSubscriptionId } from "@/lib/validation/subscription";
-
-const NOT_FOUND = "Subscription not found";
-
-function redirectToDashboardWithError(context: Parameters<APIRoute>[0], message: string) {
-  return context.redirect(`/dashboard?error=${encodeURIComponent(message)}`);
-}
 
 export const POST: APIRoute = async (context) => {
   if (!context.locals.user) {

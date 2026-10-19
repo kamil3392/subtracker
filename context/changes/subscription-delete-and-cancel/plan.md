@@ -300,9 +300,9 @@ Brak migracji schematu. Istniejące wiersze `cancelled` (nieosiągalne z UI prze
 
 #### Automated
 
-- [x] 1.1 Testy jednostkowe przechodzą: `npm test`
-- [x] 1.2 Lint przechodzi: `npm run lint`
-- [x] 1.3 Typy przechodzą: `npx astro check`
+- [x] 1.1 Testy jednostkowe przechodzą: `npm test` — 0873f4d
+- [x] 1.2 Lint przechodzi: `npm run lint` — 0873f4d
+- [x] 1.3 Typy przechodzą: `npx astro check` — 0873f4d
 
 #### Manual
 
@@ -313,9 +313,9 @@ Brak migracji schematu. Istniejące wiersze `cancelled` (nieosiągalne z UI prze
 
 #### Automated
 
-- [ ] 2.1 Testy jednostkowe przechodzą: `npm test`
-- [ ] 2.2 Lint przechodzi: `npm run lint`
-- [ ] 2.3 Typy przechodzą: `npx astro check`
+- [x] 2.1 Testy jednostkowe przechodzą: `npm test`
+- [x] 2.2 Lint przechodzi: `npm run lint`
+- [x] 2.3 Typy przechodzą: `npx astro check`
 - [ ] 2.4 Smoke przechodzi w CI (job `smoke`) lub lokalnie przeciw działającemu serwerowi
 
 #### Manual

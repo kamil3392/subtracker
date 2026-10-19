@@ -16,7 +16,13 @@ import type { Subscription } from "@/types";
 
 const error = Astro.url.searchParams.get("error");
 // F6: after a failed add the endpoint carries the typed values back in the query string.
-const initialValues = error ? formValuesFromSearchParams(Astro.url.searchParams) : undefined;
+const carriedValues = error ? formValuesFromSearchParams(Astro.url.searchParams) : undefined;
+// F4: an error without carried fields did not come from `formErrorLocation` (the add form), so it is
+// an action on an entry (edit, cancel, delete) and is shown as a page-level banner, not in the form.
+const isPageError = carriedValues !== undefined && Object.keys(carriedValues).length === 0;
+const pageError = isPageError ? error : null;
+const formError = isPageError ? null : error;
+const initialValues = isPageError ? undefined : carriedValues;
 
 let subscriptions: Subscription[] = [];
 let loadError: string | null = null;
@@ -60,6 +66,12 @@ function formatDate(date: string): string {
 
       <div class="mx-auto grid max-w-5xl grid-cols-1 gap-6 py-6 text-white lg:grid-cols-[1fr_22rem]">
         <div class="space-y-6">
+          {pageError && (
+            <p role="alert" class="rounded-xl border border-red-500/30 bg-red-900/30 px-4 py-3 text-sm text-red-300">
+              {pageError}
+            </p>
+          )}
+
           <h1 class="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-3xl font-bold text-transparent">
             Your subscriptions
           </h1>
@@ -160,7 +172,7 @@ function formatDate(date: string): string {
             pendingText="Saving..."
             submitIcon="plus"
             initialValues={initialValues}
-            serverError={error}
+            serverError={formError}
             client:load
           />
         </section>

@@ -46,7 +46,7 @@ Standardowe skrypty (`dev`, `build`, `preview`, `lint`, `format`, `test`, `smoke
 
 ### UI
 
-- Tokeny w `src/styles/global.css`: `:root` = jasny motyw (shadcn new-york/neutral, nadpisany tylko `--ring`; uzasadnienie w `context/changes/dashboard-design-tokens/tokens.md`), publikowane przez `@theme inline`; `.dark` istnieje, ale jest nieużywany.
+- Tokeny w `src/styles/global.css`: `:root` = jasny motyw (shadcn new-york/neutral, nadpisany tylko `--ring` dla kontrastu fokusu ≥3:1; uzasadnienie w komentarzu nad `:root`), publikowane przez `@theme inline`; `.dark` istnieje, ale jest nieużywany.
 - Komponenty w `src/components/ui/` (button, card, input, label, alert, alert-dialog) — sprawdź tam przed utworzeniem własnego; brakujący dodaj `npx shadcn@latest add <name>`.
 - W widokach (`src/pages/`, `src/components/` poza `ui/`) żadnych klas palety (`text-white`, `bg-red-500`…), hex/rgb/hsl/oklch ani wartości arbitralnych `-[Npx]`/`-[Nrem]` — tylko role: `bg-card`, `text-muted-foreground`, `text-destructive` itd. Zamiast `ring-[3px]` pisz `ring-3`.
 - Pierścienie fokusu w `ui/*` mają pełne krycie (`ring-ring`, `ring-destructive`) — nie przywracaj `/50` ani `/20`.

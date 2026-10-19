@@ -72,7 +72,7 @@ Evidence: every planned change verified MATCH (known adaptations as reported dur
 - **Location**: CLAUDE.md:49, src/styles/global.css:8
 - **Detail**: Both point to `context/changes/dashboard-design-tokens/tokens.md`; `/10x-archive` moves the folder to `context/archive/`, leaving the next agent a dead reference.
 - **Fix**: Move the ring rationale into the `global.css` comment itself (2 lines) and drop the path from CLAUDE.md, or repoint both at archive time.
-- **Decision**: PENDING
+- **Decision**: FIXED — ring rationale and contrast figures moved into the comment above `:root` in global.css; CLAUDE.md points to that comment instead of the change folder
 
 ### F6 — Kitchen-sink page is bundled into the production worker
 

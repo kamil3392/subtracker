@@ -1,0 +1,162 @@
+---
+import DashboardView from "@/components/dashboard/DashboardView.astro";
+import { carriedFormValues, defaultSubscriptions } from "@/components/dashboard/fixtures";
+import { SubmitButton } from "@/components/form/SubmitButton";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import Layout from "@/layouts/Layout.astro";
+import { todayInWarsaw } from "@/lib/services/dates";
+
+// Dev-only kitchen sink: every dashboard state on one page, without Supabase or a session.
+// Not in PROTECTED_ROUTES; outside `astro dev` the middleware (DEV_ONLY_ROUTES) answers 404 before this renders.
+
+const today = todayInWarsaw(new Date());
+const subscriptions = defaultSubscriptions(today);
+const buttonVariants = ["default", "secondary", "outline", "destructive", "ghost", "link"] as const;
+---
+
+<Layout title="Dashboard states">
+  <main class="mx-auto max-w-5xl space-y-10 p-4 sm:p-8">
+    <header class="space-y-1">
+      <h1 class="text-3xl font-bold text-foreground">Dashboard states</h1>
+      <p class="text-sm text-muted-foreground">
+        Dev-only kitchen sink (404 outside <code>astro dev</code>). Fixtures are relative to today ({today},
+        Europe/Warsaw).
+      </p>
+    </header>
+
+    <section class="space-y-3">
+      <h2 class="text-xl font-semibold text-foreground">Default</h2>
+      <p class="text-sm text-muted-foreground">
+        Active (PLN monthly within 30 days, USD yearly later), cancelled but still counted (Spotify), cancelled and
+        expired (Disney+: listed, not counted). Hover and focus-visible: use the mouse and Tab on these controls.
+      </p>
+      <Card className="py-0">
+        <DashboardView
+          pageError={null}
+          loadError={null}
+          subscriptions={subscriptions}
+          today={today}
+          formError={null}
+          initialValues={undefined}
+        />
+      </Card>
+    </section>
+
+    <section class="space-y-3">
+      <h2 class="text-xl font-semibold text-foreground">Empty</h2>
+      <p class="text-sm text-muted-foreground">No entries at all.</p>
+      <Card className="py-0">
+        <DashboardView
+          pageError={null}
+          loadError={null}
+          subscriptions={[]}
+          today={today}
+          formError={null}
+          initialValues={undefined}
+        />
+      </Card>
+    </section>
+
+    <section class="space-y-3">
+      <h2 class="text-xl font-semibold text-foreground">Error</h2>
+      <p class="text-sm text-muted-foreground">
+        Page-level banner (failed row action), load error, and an "Add" form error with the carried values.
+      </p>
+      <Card className="py-0">
+        <DashboardView
+          pageError="Could not cancel the subscription. Please try again."
+          loadError="Could not load your subscriptions. Please try again later."
+          subscriptions={[]}
+          today={today}
+          formError="Could not save the subscription. Please try again."
+          initialValues={carriedFormValues(today)}
+        />
+      </Card>
+    </section>
+
+    <section class="space-y-3">
+      <h2 class="text-xl font-semibold text-foreground">Loading</h2>
+      <Card>
+        <CardContent className="space-y-4">
+          <p class="text-sm text-muted-foreground">
+            N/A — SSR waits for the data before sending HTML (<code>dashboard.astro</code> frontmatter); the only
+            loading UI is the pending <code>SubmitButton</code>.
+          </p>
+          <div class="max-w-xs">
+            <SubmitButton pendingText="Saving..." icon={null} forcePending>
+              Add subscription
+            </SubmitButton>
+          </div>
+        </CardContent>
+      </Card>
+    </section>
+
+    <section class="space-y-3">
+      <h2 class="text-xl font-semibold text-foreground">Primitives</h2>
+      <Card>
+        <CardHeader>
+          <h3 class="text-lg leading-none font-semibold">Button</h3>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div class="flex flex-wrap items-center gap-2">
+            {buttonVariants.map((variant) => (
+              <Button variant={variant}>{variant}</Button>
+            ))}
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            {buttonVariants.map((variant) => (
+              <Button variant={variant} disabled>
+                {variant} (disabled)
+              </Button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <h3 class="text-lg leading-none font-semibold">Input</h3>
+        </CardHeader>
+        <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div>
+            <Label htmlFor="ks-input" className="mb-1.5">
+              Name
+            </Label>
+            <Input id="ks-input" placeholder="e.g. Netflix" />
+          </div>
+          <div>
+            <Label htmlFor="ks-input-invalid" className="mb-1.5">
+              Price
+            </Label>
+            <Input
+              id="ks-input-invalid"
+              defaultValue="abc"
+              aria-invalid="true"
+              aria-describedby="ks-input-invalid-error"
+            />
+            <p id="ks-input-invalid-error" class="mt-1 text-xs text-destructive">
+              Price must be a number with at most 8 digits and 2 decimal places
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <h3 class="text-lg leading-none font-semibold">SubmitButton (pending)</h3>
+        </CardHeader>
+        <CardContent className="flex flex-wrap items-center gap-2">
+          <SubmitButton pendingText="Saving..." icon={null} forcePending>
+            Save
+          </SubmitButton>
+          <SubmitButton pendingText="Deleting..." icon={null} variant="destructive" forcePending>
+            Delete
+          </SubmitButton>
+        </CardContent>
+      </Card>
+    </section>
+  </main>
+</Layout>

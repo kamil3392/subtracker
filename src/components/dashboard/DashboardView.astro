@@ -35,7 +35,7 @@ const isEmpty = subscriptions.length === 0;
 const allSubscriptions = [...subscriptions].sort((a, b) => a.name.localeCompare(b.name));
 ---
 
-<div class="min-h-screen w-full p-4 sm:p-8">
+<div class="w-full p-4 sm:p-8">
   <Topbar />
 
   <div class="mx-auto grid max-w-5xl grid-cols-1 gap-6 py-6 lg:grid-cols-[1fr_22rem]">
@@ -141,7 +141,7 @@ const allSubscriptions = [...subscriptions].sort((a, b) => a.name.localeCompare(
                       href={`/subscriptions/${subscription.id}/edit`}
                       class:list={buttonVariants({ variant: "outline", size: "sm" })}
                     >
-                      Edit
+                      Edit<span class="sr-only"> {subscription.name}</span>
                     </a>
                     <SubscriptionActions
                       id={subscription.id}

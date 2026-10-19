@@ -32,6 +32,9 @@ export function FormField({
   icon,
   endContent,
 }: FormFieldProps) {
+  // The message id links the field to its error for screen readers (aria-describedby); absent without an error.
+  const errorId = `${id}-error`;
+
   return (
     <div>
       <Label htmlFor={id} className="mb-1.5">
@@ -50,13 +53,14 @@ export function FormField({
           }}
           placeholder={placeholder}
           aria-invalid={error ? true : undefined}
+          aria-describedby={error ? errorId : undefined}
           className="pl-10"
         />
         {endContent}
       </div>
       {error ? (
-        <p className="text-destructive mt-1 flex items-center gap-1 text-xs">
-          <CircleAlert className="size-3" />
+        <p id={errorId} className="text-destructive mt-1 flex items-center gap-1 text-xs">
+          <CircleAlert className="size-3" aria-hidden="true" />
           {error}
         </p>
       ) : (

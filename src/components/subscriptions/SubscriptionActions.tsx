@@ -22,6 +22,8 @@ interface Props {
 
 interface ConfirmActionProps {
   action: string;
+  /** Subscription name, appended to the trigger's accessible name so each row's action is distinct. */
+  name: string;
   triggerLabel: string;
   title: string;
   description: string;
@@ -33,6 +35,7 @@ interface ConfirmActionProps {
 
 function ConfirmAction({
   action,
+  name,
   triggerLabel,
   title,
   description,
@@ -47,6 +50,7 @@ function ConfirmAction({
         <Button type="button" size="sm" variant={destructive ? "destructive" : "secondary"}>
           {icon}
           {triggerLabel}
+          <span className="sr-only"> {name}</span>
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
@@ -79,6 +83,7 @@ export default function SubscriptionActions({ id, name, status }: Props) {
       {status === "active" && (
         <ConfirmAction
           action={`/api/subscriptions/${id}/cancel`}
+          name={name}
           triggerLabel="Cancel"
           title={`Cancel ${name}?`}
           description="It keeps counting toward your total and renewals until its next renewal date, then disappears from both. This can't be undone."
@@ -89,6 +94,7 @@ export default function SubscriptionActions({ id, name, status }: Props) {
       )}
       <ConfirmAction
         action={`/api/subscriptions/${id}/delete`}
+        name={name}
         triggerLabel="Delete"
         title={`Delete ${name}?`}
         description="This permanently removes the entry. This can't be undone."

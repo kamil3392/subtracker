@@ -9,6 +9,8 @@
  * --background; see context/changes/dashboard-design-tokens/tokens.md. .dark is untouched and unused.
  */
 :root {
+  /* Native controls (date picker icon, select popup, scrollbars) follow the light theme. */
+  color-scheme: light;
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -118,6 +120,14 @@
 @layer base {
   * {
     @apply border-border outline-ring;
+  }
+  /*
+   * Fallback keyboard focus for controls without a variant (e.g. the plain link in Banner): a solid
+   * --ring outline. Components that set `outline-none` + `focus-visible:ring-*` override it (utilities layer).
+   */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
   }
   body {
     @apply bg-background text-foreground;

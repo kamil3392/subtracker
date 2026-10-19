@@ -480,16 +480,16 @@ Brak danych do migracji. Wycofanie = revert commitów zmiany; commity faz 3–4 
 
 #### Automated
 
-- [x] 4.1 Skan literałów na `src/pages/**/*.astro` i `src/components/**/*.{astro,tsx}` poza `src/components/ui/**` = 0 trafień
-- [x] 4.2 `grep -rn 'bg-cosmic' src` nie zwraca trafień
-- [x] 4.3 Lint przechodzi: `npm run lint`
-- [x] 4.4 Typy przechodzą: `npx astro check`
-- [x] 4.5 Testy przechodzą: `npm test`
-- [x] 4.6 Build przechodzi: `npm run build`
+- [x] 4.1 Skan literałów na `src/pages/**/*.astro` i `src/components/**/*.{astro,tsx}` poza `src/components/ui/**` = 0 trafień — 1eae1f1
+- [x] 4.2 `grep -rn 'bg-cosmic' src` nie zwraca trafień — 1eae1f1
+- [x] 4.3 Lint przechodzi: `npm run lint` — 1eae1f1
+- [x] 4.4 Typy przechodzą: `npx astro check` — 1eae1f1
+- [x] 4.5 Testy przechodzą: `npm test` — 1eae1f1
+- [x] 4.6 Build przechodzi: `npm run build` — 1eae1f1
 
 #### Manual
 
-- [x] 4.7 Zrzuty desktop 1280 px i mobile 375 px stron `/`, `/auth/signin`, `/auth/signup`, `/auth/confirm-email` — jasne, czytelne, bez poziomego scrolla
+- [x] 4.7 Zrzuty desktop 1280 px i mobile 375 px stron `/`, `/auth/signin`, `/auth/signup`, `/auth/confirm-email` — jasne, czytelne, bez poziomego scrolla — 1eae1f1
 - [ ] 4.8 Strona edycji (stan „not found” lokalnie, formularz po wdrożeniu) — jasna i czytelna
 - [ ] 4.9 Smoke w CI zielony po pushu commitów faz 3–4
 
@@ -497,19 +497,19 @@ Brak danych do migracji. Wycofanie = revert commitów zmiany; commity faz 3–4 
 
 #### Automated
 
-- [ ] 5.1 `npm run build` przechodzi, a w `npm run preview` żądanie `GET /dev/dashboard-states` zwraca 404
-- [ ] 5.2 W `npm run dev` żądanie `GET /dev/dashboard-states` zwraca 200
-- [ ] 5.3 `grep -rnE '\bfocus:(ring|border|outline)' src/components src/pages` nie zwraca trafień
-- [ ] 5.4 Skan literałów na plikach z fazy 4 + `src/pages/dev/*.astro` + `src/components/dashboard/*` = 0
-- [ ] 5.5 Lint przechodzi: `npm run lint`
-- [ ] 5.6 Typy przechodzą: `npx astro check`
-- [ ] 5.7 Testy przechodzą: `npm test`
+- [x] 5.1 `npm run build` przechodzi, a w `npm run preview` żądanie `GET /dev/dashboard-states` zwraca 404
+- [x] 5.2 W `npm run dev` żądanie `GET /dev/dashboard-states` zwraca 200
+- [x] 5.3 `grep -rnE '\bfocus:(ring|border|outline)' src/components src/pages` nie zwraca trafień
+- [x] 5.4 Skan literałów na plikach z fazy 4 + `src/pages/dev/*.astro` + `src/components/dashboard/*` = 0
+- [x] 5.5 Lint przechodzi: `npm run lint`
+- [x] 5.6 Typy przechodzą: `npx astro check`
+- [x] 5.7 Testy przechodzą: `npm test`
 
 #### Manual
 
-- [ ] 5.8 Kitchen sink, zrzuty desktop 1280 px i mobile 375 px: każda komórka macierzy 7 stanów pokazana albo oznaczona N/A z powodem
-- [ ] 5.9 Tab przez cały dashboard: fokus widoczny na każdej kontrolce, w tym na „Delete” i linkach
-- [ ] 5.10 Czytnik ekranu lub drzewo dostępności: błąd pola opisany, przyciski wiersza z nazwą subskrypcji, zapis ogłasza stan
+- [x] 5.8 Kitchen sink, zrzuty desktop 1280 px i mobile 375 px: każda komórka macierzy 7 stanów pokazana albo oznaczona N/A z powodem
+- [x] 5.9 Tab przez cały dashboard: fokus widoczny na każdej kontrolce, w tym na „Delete” i linkach
+- [x] 5.10 Czytnik ekranu lub drzewo dostępności: błąd pola opisany, przyciski wiersza z nazwą subskrypcji, zapis ogłasza stan
 
 ### Phase 6: Zabezpieczenie kontraktu
 

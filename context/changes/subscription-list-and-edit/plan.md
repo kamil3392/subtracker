@@ -282,11 +282,11 @@ Brak migracji bazy. Przeniesienie komponentów formularza zmienia ścieżki impo
 
 #### Automated
 
-- [x] 2.1 Testy jednostkowe przechodzą: `npm test`
-- [x] 2.2 Lint przechodzi: `npm run lint`
-- [x] 2.3 Typy przechodzą: `npx astro check`
-- [x] 2.4 Build przechodzi: `npm run build`
-- [x] 2.5 W `src/components/auth/` nie ma już `FormField`, `SubmitButton`, `ServerError`: `ls src/components/auth`
+- [x] 2.1 Testy jednostkowe przechodzą: `npm test` — a90f82b
+- [x] 2.2 Lint przechodzi: `npm run lint` — a90f82b
+- [x] 2.3 Typy przechodzą: `npx astro check` — a90f82b
+- [x] 2.4 Build przechodzi: `npm run build` — a90f82b
+- [x] 2.5 W `src/components/auth/` nie ma już `FormField`, `SubmitButton`, `ServerError`: `ls src/components/auth` — a90f82b
 
 #### Manual
 

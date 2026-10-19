@@ -457,8 +457,8 @@ Brak danych do migracji. Wycofanie = revert commitów zmiany; commity faz 3–4 
 
 #### Manual
 
-- [ ] 2.6 Fokus z klawiatury (Tab) na przyciskach strony `/auth/signin` jest widoczny
-- [ ] 2.7 Baner (uruchomienie bez `.dev.vars`/`.env`) jest czytelny
+- [x] 2.6 Fokus z klawiatury (Tab) na przyciskach strony `/auth/signin` jest widoczny — 3099b88
+- [x] 2.7 Baner (uruchomienie bez `.dev.vars`/`.env`) jest czytelny — 3099b88
 
 ### Phase 3: Widok dashboardu
 
@@ -474,7 +474,7 @@ Brak danych do migracji. Wycofanie = revert commitów zmiany; commity faz 3–4 
 #### Manual
 
 - [x] 3.7 Zrzut dashboardu desktop 1280 px i mobile 375 px — jasny, czytelny, bez poziomego scrolla na 375 px — 31d6efe
-- [ ] 3.8 Dialog Cancel/Delete otwiera się w jasnych tokenach, „Keep” i potwierdzenie czytelne
+- [x] 3.8 Dialog Cancel/Delete otwiera się w jasnych tokenach, „Keep” i potwierdzenie czytelne — 31d6efe
 
 ### Phase 4: Pozostałe strony
 
@@ -490,8 +490,8 @@ Brak danych do migracji. Wycofanie = revert commitów zmiany; commity faz 3–4 
 #### Manual
 
 - [x] 4.7 Zrzuty desktop 1280 px i mobile 375 px stron `/`, `/auth/signin`, `/auth/signup`, `/auth/confirm-email` — jasne, czytelne, bez poziomego scrolla — 1eae1f1
-- [ ] 4.8 Strona edycji (stan „not found” lokalnie, formularz po wdrożeniu) — jasna i czytelna
-- [ ] 4.9 Smoke w CI zielony po pushu commitów faz 3–4
+- [x] 4.8 Strona edycji (stan „not found” lokalnie, formularz po wdrożeniu) — jasna i czytelna — 1eae1f1
+- [x] 4.9 Smoke w CI zielony po pushu commitów faz 3–4 — 1eae1f1
 
 ### Phase 5: Stany, dostępność i kitchen sink
 
@@ -515,10 +515,10 @@ Brak danych do migracji. Wycofanie = revert commitów zmiany; commity faz 3–4 
 
 #### Automated
 
-- [x] 6.1 `npm run lint` przechodzi (eslint + kontrola literałów)
-- [x] 6.2 Kontrola łapie regresję: tymczasowe `text-white` w `src/pages/dashboard.astro` daje kod wyjścia 1 z `plik:linia`
-- [x] 6.3 `grep -n 'check-ui-literals' package.json CLAUDE.md` zwraca trafienia w obu plikach
+- [x] 6.1 `npm run lint` przechodzi (eslint + kontrola literałów) — 761e1cb
+- [x] 6.2 Kontrola łapie regresję: tymczasowe `text-white` w `src/pages/dashboard.astro` daje kod wyjścia 1 z `plik:linia` — 761e1cb
+- [x] 6.3 `grep -n 'check-ui-literals' package.json CLAUDE.md` zwraca trafienia w obu plikach — 761e1cb
 
 #### Manual
 
-- [x] 6.4 Blok UI w `CLAUDE.md` jest zwięzły i wskazuje tokeny, komponenty, kitchen sink i kontrolę
+- [x] 6.4 Blok UI w `CLAUDE.md` jest zwięzły i wskazuje tokeny, komponenty, kitchen sink i kontrolę — 761e1cb

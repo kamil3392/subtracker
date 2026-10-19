@@ -297,16 +297,16 @@ Brak migracji bazy. Przeniesienie komponentów formularza zmienia ścieżki impo
 
 #### Automated
 
-- [x] 3.1 Testy jednostkowe przechodzą: `npm test`
-- [x] 3.2 Lint przechodzi: `npm run lint`
-- [x] 3.3 Typy przechodzą: `npx astro check`
-- [x] 3.4 Build przechodzi: `npm run build`
-- [ ] 3.5 Job `smoke` w CI przechodzi z nowymi krokami edycji
+- [x] 3.1 Testy jednostkowe przechodzą: `npm test` — d188066
+- [x] 3.2 Lint przechodzi: `npm run lint` — d188066
+- [x] 3.3 Typy przechodzą: `npx astro check` — d188066
+- [x] 3.4 Build przechodzi: `npm run build` — d188066
+- [x] 3.5 Job `smoke` w CI przechodzi z nowymi krokami edycji — d188066
 
 #### Manual
 
-- [ ] 3.6 Na produkcji przepływ MVP z PRD z edycją jednej subskrypcji daje poprawną sumę i odnowienia
-- [ ] 3.7 Edycja samej ceny wpisu z datą w przeszłości nie zmienia pokazywanej daty odnowienia
-- [ ] 3.8 Zmiana daty w formularzu edycji przesuwa wpis na liście odnowień zgodnie z nową datą
-- [ ] 3.9 Błąd walidacji na stronie edycji zostawia wpisane wartości i komunikat
-- [ ] 3.10 Drugie konto otwierające edycję cudzego wpisu widzi „Subscription not found”
+- [x] 3.6 Na produkcji przepływ MVP z PRD z edycją jednej subskrypcji daje poprawną sumę i odnowienia — d188066
+- [x] 3.7 Edycja samej ceny wpisu z datą w przeszłości nie zmienia pokazywanej daty odnowienia — d188066
+- [x] 3.8 Zmiana daty w formularzu edycji przesuwa wpis na liście odnowień zgodnie z nową datą — d188066
+- [x] 3.9 Błąd walidacji na stronie edycji zostawia wpisane wartości i komunikat — d188066
+- [x] 3.10 Drugie konto otwierające edycję cudzego wpisu widzi „Subscription not found” — d188066

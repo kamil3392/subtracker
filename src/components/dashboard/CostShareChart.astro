@@ -1,0 +1,88 @@
+---
+import { formatMoney } from "@/lib/format";
+import type { CostShareGroup } from "@/lib/services/subscriptions";
+
+// Donut of each subscription's share in one currency's monthly cost, with a legend that carries the
+// names, amounts and percentages (identity never by colour alone; slots 3–5 are under 3:1 on white).
+interface Props {
+  group: CostShareGroup;
+}
+
+const { group } = Astro.props;
+
+// Categorical slots in fixed order (--chart-1…5 in global.css); "Other" is neutral, not a sixth hue.
+const SLOT_STROKE = ["stroke-chart-1", "stroke-chart-2", "stroke-chart-3", "stroke-chart-4", "stroke-chart-5"];
+const SLOT_FILL = ["bg-chart-1", "bg-chart-2", "bg-chart-3", "bg-chart-4", "bg-chart-5"];
+const OTHER_STROKE = "stroke-muted-foreground";
+const OTHER_FILL = "bg-muted-foreground";
+
+// Colour follows the subscription, not its rank: slots go out in name order, so a price change
+// re-sorts the legend without repainting the entries.
+const slotByKey = new Map(
+  group.slices
+    .filter((slice) => slice.key !== "other")
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map((slice, index) => [slice.key, index]),
+);
+
+const SIZE = 112;
+const RADIUS = 44;
+const STROKE_WIDTH = 16;
+const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+// 2px surface gap between touching segments; none when there is only one.
+const GAP = group.slices.length > 1 ? 2 : 0;
+
+const total = group.slices.reduce((sum, slice) => sum + slice.monthlyCents, 0);
+let offset = 0;
+const segments = group.slices.map((slice) => {
+  const length = total > 0 ? (slice.monthlyCents / total) * CIRCUMFERENCE : 0;
+  const slot = slotByKey.get(slice.key);
+  const segment = {
+    ...slice,
+    dash: Math.max(length - GAP, 0),
+    offset,
+    stroke: slot === undefined ? OTHER_STROKE : SLOT_STROKE[slot],
+    fill: slot === undefined ? OTHER_FILL : SLOT_FILL[slot],
+    label: `${slice.name}: ${formatMoney(slice.monthlyCents / 100, group.currency)} (${String(slice.percent)}%)`,
+  };
+  offset += length;
+  return segment;
+});
+---
+
+<div class="mt-4 flex flex-wrap items-center gap-4">
+  <svg
+    viewBox={`0 0 ${String(SIZE)} ${String(SIZE)}`}
+    class="size-28 shrink-0 -rotate-90"
+    role="img"
+    aria-label={`Share of the monthly ${group.currency} cost by subscription`}
+  >
+    {segments.map((segment) => (
+      <circle
+        cx={SIZE / 2}
+        cy={SIZE / 2}
+        r={RADIUS}
+        fill="none"
+        stroke-width={STROKE_WIDTH}
+        stroke-dasharray={`${String(segment.dash)} ${String(CIRCUMFERENCE)}`}
+        stroke-dashoffset={-segment.offset}
+        class:list={segment.stroke}
+      >
+        <title>{segment.label}</title>
+      </circle>
+    ))}
+  </svg>
+
+  <ul class="min-w-48 flex-1 space-y-1.5 text-sm">
+    {segments.map((segment) => (
+      <li class="flex items-center gap-2" title={segment.label}>
+        <span class:list={["size-2.5 shrink-0 rounded-sm", segment.fill]} aria-hidden="true" />
+        <span class="min-w-0 flex-1 truncate text-foreground">{segment.name}</span>
+        <span class="text-muted-foreground tabular-nums">
+          {formatMoney(segment.monthlyCents / 100, group.currency)}
+        </span>
+        <span class="w-10 text-right font-medium text-foreground tabular-nums">{String(segment.percent)}%</span>
+      </li>
+    ))}
+  </ul>
+</div>

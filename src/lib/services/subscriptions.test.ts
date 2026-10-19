@@ -7,6 +7,7 @@ import {
   countsToward,
   effectiveRenewalDate,
   monthlyCostByCurrency,
+  monthlyCostShares,
   nextRenewalDate,
   renewalDateToStore,
   upcomingRenewals,
@@ -255,6 +256,54 @@ describe("monthlyCostByCurrency", () => {
   it("returns an empty list when no subscription counts", () => {
     expect(monthlyCostByCurrency([], today)).toEqual([]);
     expect(monthlyCostByCurrency([sub({ next_renewal_date: "2026-09-30", status: "cancelled" })], today)).toEqual([]);
+  });
+});
+
+describe("monthlyCostShares", () => {
+  const today = "2026-10-02";
+
+  it("splits each currency's monthly cost into per-subscription shares, largest first", () => {
+    const subs = [
+      sub({ name: "Small", price: 10, billing_cycle: "monthly" }),
+      sub({ name: "Big", price: 360, billing_cycle: "yearly" }),
+      sub({ name: "Dollar", price: 5, currency: "USD" }),
+    ];
+
+    expect(monthlyCostShares(subs, today)).toEqual([
+      {
+        currency: "PLN",
+        slices: [
+          { key: subs[1].id, name: "Big", monthlyCents: 3000, percent: 75 },
+          { key: subs[0].id, name: "Small", monthlyCents: 1000, percent: 25 },
+        ],
+      },
+      { currency: "USD", slices: [{ key: subs[2].id, name: "Dollar", monthlyCents: 500, percent: 100 }] },
+    ]);
+  });
+
+  it("makes the percentages of one currency sum to exactly 100", () => {
+    const subs = [sub({ name: "A" }), sub({ name: "B" }), sub({ name: "C" })];
+
+    const [group] = monthlyCostShares(subs, today);
+    expect(group.slices.map((s) => s.percent)).toEqual([34, 33, 33]);
+  });
+
+  it("folds the smallest subscriptions into Other beyond maxSlices", () => {
+    const subs = [10, 20, 30, 40].map((price, i) => sub({ name: `S${String(i)}`, price }));
+
+    const [group] = monthlyCostShares(subs, today, 3);
+    expect(group.slices.map((s) => [s.name, s.monthlyCents])).toEqual([
+      ["S3", 4000],
+      ["S2", 3000],
+      ["Other", 3000],
+    ]);
+    expect(group.slices[2].key).toBe("other");
+  });
+
+  it("leaves out subscriptions that do not count (FR-007)", () => {
+    const subs = [sub({ name: "Live" }), sub({ name: "Ended", status: "cancelled", next_renewal_date: "2026-09-30" })];
+
+    expect(monthlyCostShares(subs, today)[0].slices.map((s) => s.name)).toEqual(["Live"]);
   });
 });
 

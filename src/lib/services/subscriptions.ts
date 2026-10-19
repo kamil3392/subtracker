@@ -15,6 +15,22 @@ export interface MonthlyCost {
   monthlyCents: number;
 }
 
+export interface CostShareSlice {
+  /** Subscription id, or `"other"` for the folded remainder. */
+  key: string;
+  name: string;
+  /** Monthly cost in minor units, rounded per slice (display only; the share uses unrounded values). */
+  monthlyCents: number;
+  /** Whole percent of the currency's monthly cost; the slices of one currency sum to 100. */
+  percent: number;
+}
+
+export interface CostShareGroup {
+  currency: string;
+  /** Largest first; at most `maxSlices` slices, the last one "Other" when subscriptions were folded. */
+  slices: CostShareSlice[];
+}
+
 export interface UpcomingRenewal {
   subscription: Subscription;
   renewalDate: string;
@@ -113,6 +129,60 @@ export function monthlyCostByCurrency(subs: Subscription[], today: string): Mont
   return [...yearlyCentsByCurrency.entries()]
     .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
     .map(([currency, yearlyCents]) => ({ currency, monthlyCents: Math.round(yearlyCents / 12) }));
+}
+
+/**
+ * Share of each subscription in its currency's monthly cost (FR-008 breakdown; same counting rule
+ * as `monthlyCostByCurrency`, no cross-currency totals). Within a currency, subscriptions are
+ * sorted by cost (ties by name); when there are more than `maxSlices`, the smallest fold into one
+ * "Other" slice so the total stays at `maxSlices` (a part-to-whole chart reads up to ~6 segments).
+ * Percentages use the largest-remainder method so each currency's slices sum to exactly 100.
+ * Sorted by currency code; empty when no subscription counts.
+ */
+export function monthlyCostShares(subs: Subscription[], today: string, maxSlices = 6): CostShareGroup[] {
+  const byCurrency = new Map<string, { key: string; name: string; yearlyCents: number }[]>();
+  for (const sub of subs) {
+    if (!countsToward(sub, today)) continue;
+    const yearlyCents = Math.round(sub.price * 100) * (12 / CYCLE_MONTHS[sub.billing_cycle]);
+    const entries = byCurrency.get(sub.currency) ?? [];
+    entries.push({ key: sub.id, name: sub.name, yearlyCents });
+    byCurrency.set(sub.currency, entries);
+  }
+
+  return [...byCurrency.entries()]
+    .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
+    .map(([currency, entries]) => {
+      entries.sort((a, b) => b.yearlyCents - a.yearlyCents || a.name.localeCompare(b.name));
+      const kept = entries.length > maxSlices ? entries.slice(0, maxSlices - 1) : entries;
+      const rest = entries.slice(kept.length);
+      const slices = rest.length
+        ? [...kept, { key: "other", name: "Other", yearlyCents: rest.reduce((sum, e) => sum + e.yearlyCents, 0) }]
+        : kept;
+
+      const total = slices.reduce((sum, s) => sum + s.yearlyCents, 0);
+      const exact = slices.map((s) => (total > 0 ? (s.yearlyCents / total) * 100 : 0));
+      const percents = exact.map(Math.floor);
+      let missing = total > 0 ? 100 - percents.reduce((sum, p) => sum + p, 0) : 0;
+      // Hand the remaining points to the largest fractional parts (stable: earlier, larger slices first).
+      for (const index of exact
+        .map((value, i) => ({ i, fraction: value - Math.floor(value) }))
+        .sort((a, b) => b.fraction - a.fraction)
+        .map(({ i }) => i)) {
+        if (missing <= 0) break;
+        percents[index] += 1;
+        missing -= 1;
+      }
+
+      return {
+        currency,
+        slices: slices.map((s, i) => ({
+          key: s.key,
+          name: s.name,
+          monthlyCents: Math.round(s.yearlyCents / 12),
+          percent: percents[i],
+        })),
+      };
+    });
 }
 
 /**

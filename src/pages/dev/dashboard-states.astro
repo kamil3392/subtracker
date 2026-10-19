@@ -1,6 +1,6 @@
 ---
 import DashboardView from "@/components/dashboard/DashboardView.astro";
-import { carriedFormValues, defaultSubscriptions } from "@/components/dashboard/fixtures";
+import { carriedFormValues, defaultSubscriptions, manySubscriptions } from "@/components/dashboard/fixtures";
 import { SubmitButton } from "@/components/form/SubmitButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -38,6 +38,23 @@ const buttonVariants = ["default", "secondary", "outline", "destructive", "ghost
           pageError={null}
           loadError={null}
           subscriptions={subscriptions}
+          today={today}
+          formError={null}
+          initialValues={undefined}
+        />
+      </Card>
+    </section>
+
+    <section class="space-y-3">
+      <h2 class="text-xl font-semibold text-foreground">Many subscriptions</h2>
+      <p class="text-sm text-muted-foreground">
+        Seven counted PLN entries: the cost-share chart shows the five largest and folds the rest into "Other".
+      </p>
+      <Card className="py-0">
+        <DashboardView
+          pageError={null}
+          loadError={null}
+          subscriptions={manySubscriptions(today)}
           today={today}
           formError={null}
           initialValues={undefined}

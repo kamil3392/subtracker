@@ -52,6 +52,7 @@ Standardowe skrypty (`dev`, `build`, `preview`, `lint`, `format`, `test`, `smoke
 - Pierścienie fokusu w `ui/*` mają pełne krycie (`ring-ring`, `ring-destructive`) — nie przywracaj `/50` ani `/20`.
 - W `.astro` Radix `asChild` nie działa (dzieci to statyczny HTML): link/przycisk stylizuj `class:list={buttonVariants({ variant, size })}` z `@/components/ui/button` na zwykłym `<a>`/`<button>`.
 - Widok dashboardu to `src/components/dashboard/DashboardView.astro` (czysty widok z propsów; dane ładuje `src/pages/dashboard.astro`). Kitchen sink wszystkich stanów: `/dev/dashboard-states` (fikstury w `src/components/dashboard/fixtures.ts`, tylko `astro dev`) — nowy stan widoku dodaj tam.
+- Wykresy: kolory tylko z `--chart-1…5` (klasy `stroke-chart-N`/`bg-chart-N`, zwalidowane pod CVD — uzasadnienie w komentarzu w `global.css`), w stałej kolejności, nigdy cyklicznie; ponad 5 serii składaj w neutralne „Other”; zawsze legenda z nazwą i wartością (sloty 3–5 mają <3:1 na białym). Wzorzec: `src/components/dashboard/CostShareChart.astro` (SVG bez zależności).
 - Kontrola: `npm run lint` uruchamia `scripts/check-ui-literals.mjs`, który wypisuje `plik:linia` i kończy się kodem 1 przy literale.
 
 ### Zmienne środowiskowe

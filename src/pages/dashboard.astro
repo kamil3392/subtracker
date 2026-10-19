@@ -1,5 +1,6 @@
 ---
 import Topbar from "@/components/Topbar.astro";
+import SubscriptionActions from "@/components/subscriptions/SubscriptionActions";
 import SubscriptionForm from "@/components/subscriptions/SubscriptionForm";
 import Layout from "@/layouts/Layout.astro";
 import { BILLING_CYCLE_LABELS } from "@/lib/currencies";
@@ -151,12 +152,20 @@ function formatDate(date: string): string {
                           : `Cancelled · ${countsToward(subscription, today) ? "ends" : "ended"} ${formatDate(effectiveRenewalDate(subscription, today))}`}
                       </p>
                     </div>
-                    <a
-                      href={`/subscriptions/${subscription.id}/edit`}
-                      class="text-sm text-purple-300 transition-colors hover:text-purple-100 hover:underline"
-                    >
-                      Edit
-                    </a>
+                    <div class="flex flex-wrap items-center gap-2">
+                      <a
+                        href={`/subscriptions/${subscription.id}/edit`}
+                        class="text-sm text-purple-300 transition-colors hover:text-purple-100 hover:underline"
+                      >
+                        Edit
+                      </a>
+                      <SubscriptionActions
+                        id={subscription.id}
+                        name={subscription.name}
+                        status={subscription.status}
+                        client:load
+                      />
+                    </div>
                   </li>
                 ))}
               </ul>

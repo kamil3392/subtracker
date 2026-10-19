@@ -9,7 +9,7 @@ main_goal: speed
 top_blocker: time
 milestone_id: first-usable-tracker
 milestone_seq: 1
-milestone_status: open           # open | done
+milestone_status: done           # open | done
 ---
 
 # Roadmap: Subtracker
@@ -20,7 +20,7 @@ milestone_status: open           # open | done
 
 ## Milestone
 
-**M-1: Pierwszy używalny tracker subskrypcji** — Status: open
+**M-1: Pierwszy używalny tracker subskrypcji** — Status: done
 
 - **Intent:** Zalogowany użytkownik przechodzi cały przepływ MVP z PRD — rejestracja, dodanie trzech subskrypcji, edycja jednej — i na ekranie głównym widzi poprawny koszt miesięczny per waluta oraz odnowienia w ciągu 30 dni; może też usuwać i anulować wpisy.
 - **Source materials:** `context/foundation/prd.md` (v1)
@@ -150,6 +150,8 @@ Brak przekrojowych pytań na dzień 2026-10-02 (PRD §Open Questions: brak otwar
 - **Śledzenie błędów poza logami platformy** — Why parked: żaden FR/NFR tego nie wymaga; cel `speed`.
 
 ## Milestone History
+
+- **M-1: Pierwszy używalny tracker subskrypcji** (`first-usable-tracker`) — closed 2026-10-19. Zalogowany użytkownik przechodzi przepływ MVP z PRD (rejestracja, dodanie, edycja, anulowanie i usuwanie subskrypcji) z poprawnym kosztem miesięcznym per waluta i odnowieniami w 30 dni na produkcji; F-01, S-01, S-02, S-03 done.
 
 ## Done
 

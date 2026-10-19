@@ -290,17 +290,17 @@ Brak migracji bazy. Przeniesienie komponentów formularza zmienia ścieżki impo
 
 #### Manual
 
-- [ ] 2.6 Logowanie, rejestracja i dodawanie subskrypcji działają jak przed zmianą
-- [ ] 2.7 Błąd serwera przy dodawaniu zostawia wpisane nazwę, cenę i datę w formularzu
+- [x] 2.6 Logowanie, rejestracja i dodawanie subskrypcji działają jak przed zmianą — a90f82b
+- [x] 2.7 Błąd serwera przy dodawaniu zostawia wpisane nazwę, cenę i datę w formularzu — a90f82b
 
 ### Phase 3: Lista i edycja
 
 #### Automated
 
-- [ ] 3.1 Testy jednostkowe przechodzą: `npm test`
-- [ ] 3.2 Lint przechodzi: `npm run lint`
-- [ ] 3.3 Typy przechodzą: `npx astro check`
-- [ ] 3.4 Build przechodzi: `npm run build`
+- [x] 3.1 Testy jednostkowe przechodzą: `npm test`
+- [x] 3.2 Lint przechodzi: `npm run lint`
+- [x] 3.3 Typy przechodzą: `npx astro check`
+- [x] 3.4 Build przechodzi: `npm run build`
 - [ ] 3.5 Job `smoke` w CI przechodzi z nowymi krokami edycji
 
 #### Manual

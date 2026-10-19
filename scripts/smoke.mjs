@@ -1,11 +1,27 @@
-// Smoke test: proves the built app, the Cloudflare adapter, the Supabase auth flow and adding a subscription still work together.
+// Smoke test: proves the built app, the Cloudflare adapter, the Supabase auth flow and adding and editing a subscription
+// still work together.
 // Zero dependencies on purpose. Run against a live server: BASE_URL=http://localhost:4321 node scripts/smoke.mjs
+
+import { randomUUID } from "node:crypto";
 
 const BASE_URL = process.env.BASE_URL ?? "http://localhost:4321";
 const email = `smoke-${Date.now()}@example.com`;
 const password = "Smoke-Test-Passw0rd!";
 const subscriptionName = `Smoke Sub ${Date.now()}`;
+const renamedSubscriptionName = `${subscriptionName} Edited`;
+// A well-formed id that belongs to no row the smoke user can see.
+const foreignId = randomUUID();
 const jar = new Map();
+// Set by the "dashboard lists the added subscription" step from the entry's Edit link.
+let subscriptionId = null;
+
+const EDIT_LINK_PATTERN = /href="\/subscriptions\/([0-9a-f-]{36})\/edit"/i;
+
+// Steps that need the id fail with this result instead of crashing when it could not be extracted.
+function withSubscriptionId(run) {
+  return () =>
+    subscriptionId ? run(subscriptionId) : { status: 0, location: "(no subscription id extracted)", body: "" };
+}
 
 function cookieHeader() {
   return [...jar.entries()].map(([k, v]) => `${k}=${v}`).join("; ");
@@ -76,12 +92,63 @@ const steps = [
   ],
   [
     "dashboard lists the added subscription",
-    () => request("/dashboard"),
+    async () => {
+      const result = await request("/dashboard");
+      subscriptionId = EDIT_LINK_PATTERN.exec(result.body)?.[1] ?? null;
+      return result;
+    },
     { status: 200, bodyIncludes: subscriptionName },
   ],
+  [
+    "edit page renders the subscription",
+    withSubscriptionId((id) => request(`/subscriptions/${id}/edit`)),
+    { status: 200, bodyIncludes: subscriptionName },
+  ],
+  [
+    "edit subscription redirects to dashboard",
+    withSubscriptionId((id) =>
+      request(`/api/subscriptions/${id}`, {
+        method: "POST",
+        form: {
+          name: renamedSubscriptionName,
+          price: "59.99",
+          currency: "PLN",
+          billing_cycle: "monthly",
+          next_renewal_date: new Date().toISOString().slice(0, 10),
+        },
+      }),
+    ),
+    { status: 302, location: "/dashboard", exactLocation: true },
+  ],
+  [
+    "dashboard lists the edited subscription",
+    () => request("/dashboard"),
+    { status: 200, bodyIncludes: renamedSubscriptionName },
+  ],
+  [
+    "edit of an unknown subscription is rejected",
+    () =>
+      request(`/api/subscriptions/${foreignId}`, {
+        method: "POST",
+        form: {
+          name: renamedSubscriptionName,
+          price: "59.99",
+          currency: "PLN",
+          billing_cycle: "monthly",
+          next_renewal_date: new Date().toISOString().slice(0, 10),
+        },
+      }),
+    { status: 302, location: "/dashboard?error=" },
+  ],
+  ["edit page of an unknown subscription is 404", () => request(`/subscriptions/${foreignId}/edit`), { status: 404 }],
   ["home redirects signed-in user to dashboard", () => request("/"), { status: 302, location: "/dashboard" }],
   ["signout clears session", () => request("/api/auth/signout", { method: "POST" }), { status: 302, location: "/" }],
   ["dashboard redirects after signout", () => request("/dashboard"), { status: 302, location: "/auth/signin" }],
+  [
+    "edit page redirects after signout",
+    withSubscriptionId((id) => request(`/subscriptions/${id}/edit`)),
+    { status: 302, location: "/auth/signin" },
+  ],
 ];
 
 let failed = 0;

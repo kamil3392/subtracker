@@ -56,7 +56,7 @@ npm run dev
 - `npm run lint:fix` - Auto-fix ESLint issues
 - `npm run format` - Run Prettier
 - `npm run test` - Run the unit tests once (vitest, `src/**/*.test.ts`); a single file: `npx vitest run <path>`
-- `npm run smoke` - Smoke test the auth flow and adding a subscription against a running server (`BASE_URL`, defaults to `http://localhost:4321`)
+- `npm run smoke` - Smoke test the auth flow and adding and editing a subscription against a running server (`BASE_URL`, defaults to `http://localhost:4321`)
 - `npm run db:types` - Regenerate `src/db/database.types.ts` from the local Supabase database
 
 ## Project Structure
@@ -174,7 +174,7 @@ Set `SUPABASE_URL` and `SUPABASE_KEY` as Workers Secrets via `npx wrangler secre
 
 ## Smoke test
 
-`scripts/smoke.mjs` is a dependency-free Node script that walks the whole auth flow (sign-up, sign-in, protected page, sign-out) and adding a subscription (`POST /api/subscriptions`, then checking that `/dashboard` lists it) over HTTP. Run it against the dev server or the production preview after dependency upgrades:
+`scripts/smoke.mjs` is a dependency-free Node script that walks the whole auth flow (sign-up, sign-in, protected page, sign-out), adding a subscription (`POST /api/subscriptions`, then checking that `/dashboard` lists it) and editing it (the edit page, `POST /api/subscriptions/<id>`, the renamed entry on `/dashboard`, a 404/redirect for an unknown id and the sign-in redirect after sign-out) over HTTP. Run it against the dev server or the production preview after dependency upgrades:
 
 ```bash
 npm run dev            # or: npm run build && npm run preview

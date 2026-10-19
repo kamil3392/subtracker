@@ -4,7 +4,7 @@ import SubscriptionForm from "@/components/subscriptions/SubscriptionForm";
 import Layout from "@/layouts/Layout.astro";
 import { BILLING_CYCLE_LABELS } from "@/lib/currencies";
 import { todayInWarsaw } from "@/lib/services/dates";
-import { monthlyCostByCurrency, upcomingRenewals } from "@/lib/services/subscriptions";
+import { monthlyCostByCurrency, nextRenewalDate, upcomingRenewals } from "@/lib/services/subscriptions";
 import { formValuesFromSearchParams } from "@/lib/subscription-form";
 import { createClient } from "@/lib/supabase";
 import type { Subscription } from "@/types";
@@ -33,6 +33,8 @@ const today = todayInWarsaw(new Date());
 const costs = monthlyCostByCurrency(subscriptions);
 const renewals = upcomingRenewals(subscriptions, today);
 const isEmpty = costs.length === 0;
+// FR-004: every entry from the rows already loaded (no extra query), sorted by name.
+const allSubscriptions = [...subscriptions].sort((a, b) => a.name.localeCompare(b.name));
 
 function formatMoney(amount: number, currency: string): string {
   return new Intl.NumberFormat("pl-PL", { style: "currency", currency }).format(amount);
@@ -102,6 +104,37 @@ function formatDate(date: string): string {
                 )}
               </section>
             </>
+          )}
+
+          {!loadError && allSubscriptions.length > 0 && (
+            <section>
+              <h2 class="mb-3 text-lg font-semibold">All subscriptions</h2>
+              <ul class="divide-y divide-white/10 rounded-xl border border-white/10 bg-white/5 backdrop-blur-xl">
+                {allSubscriptions.map((subscription) => (
+                  <li class="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
+                    <div>
+                      <p class="font-medium">{subscription.name}</p>
+                      <p class="text-sm text-blue-100/60">
+                        {formatMoney(subscription.price, subscription.currency)} ·{" "}
+                        {BILLING_CYCLE_LABELS[subscription.billing_cycle]}
+                      </p>
+                      <p class="text-sm text-blue-100/60">
+                        {/* Cancelled entries (not reachable from the UI yet) skip the rollover; FR-007 is S-03. */}
+                        {subscription.status === "active"
+                          ? `Next renewal: ${formatDate(nextRenewalDate(subscription.next_renewal_date, subscription.billing_cycle, today))}`
+                          : "Cancelled"}
+                      </p>
+                    </div>
+                    <a
+                      href={`/subscriptions/${subscription.id}/edit`}
+                      class="text-sm text-purple-300 transition-colors hover:text-purple-100 hover:underline"
+                    >
+                      Edit
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </section>
           )}
         </div>
 

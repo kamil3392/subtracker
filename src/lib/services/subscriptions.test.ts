@@ -2,7 +2,15 @@ import { describe, expect, it } from "vitest";
 
 import type { BillingCycle, Subscription, SubscriptionStatus } from "@/types";
 
-import { monthlyCostByCurrency, nextRenewalDate, renewalDateToStore, upcomingRenewals } from "./subscriptions";
+import {
+  cancellationEndDate,
+  countsToward,
+  effectiveRenewalDate,
+  monthlyCostByCurrency,
+  nextRenewalDate,
+  renewalDateToStore,
+  upcomingRenewals,
+} from "./subscriptions";
 
 let nextId = 0;
 
@@ -137,10 +145,36 @@ describe("upcomingRenewals", () => {
     expect(upcomingRenewals([rolled], today)).toEqual([{ subscription: rolled, renewalDate: "2026-10-31" }]);
   });
 
-  it("skips cancelled subscriptions", () => {
-    const cancelled = sub({ name: "Cancelled", next_renewal_date: "2026-10-10", status: "cancelled" });
+  it("lists a cancelled subscription ending today with its end date", () => {
+    const cancelled = sub({ next_renewal_date: "2026-10-02", status: "cancelled" });
+
+    expect(upcomingRenewals([cancelled], today)).toEqual([{ subscription: cancelled, renewalDate: "2026-10-02" }]);
+  });
+
+  it("lists a cancelled subscription ending on the last day of the window", () => {
+    const cancelled = sub({ next_renewal_date: "2026-11-01", status: "cancelled" });
+
+    expect(upcomingRenewals([cancelled], today)).toEqual([{ subscription: cancelled, renewalDate: "2026-11-01" }]);
+  });
+
+  it("skips a cancelled subscription whose end date has passed, without rolling it over", () => {
+    // A monthly rollover of 2026-09-15 would land on 2026-10-15, inside the window.
+    const ended = sub({ billing_cycle: "monthly", next_renewal_date: "2026-09-15", status: "cancelled" });
+
+    expect(upcomingRenewals([ended], today)).toEqual([]);
+  });
+
+  it("keeps a yearly cancelled subscription ending beyond the window out of renewals but in the cost", () => {
+    // today + 120 days
+    const cancelled = sub({
+      price: 120,
+      billing_cycle: "yearly",
+      next_renewal_date: "2027-01-30",
+      status: "cancelled",
+    });
 
     expect(upcomingRenewals([cancelled], today)).toEqual([]);
+    expect(monthlyCostByCurrency([cancelled], today)).toEqual([{ currency: "PLN", monthlyCents: 1000 }]);
   });
 
   it("sorts by renewal date, then by name", () => {
@@ -164,6 +198,8 @@ describe("upcomingRenewals", () => {
 });
 
 describe("monthlyCostByCurrency", () => {
+  const today = "2026-10-02";
+
   it("normalises monthly, quarterly and yearly cycles to one monthly cost", () => {
     const subs = [
       sub({ price: 30, billing_cycle: "monthly" }),
@@ -171,19 +207,19 @@ describe("monthlyCostByCurrency", () => {
       sub({ price: 120, billing_cycle: "yearly" }),
     ];
 
-    expect(monthlyCostByCurrency(subs)).toEqual([{ currency: "PLN", monthlyCents: 7000 }]);
+    expect(monthlyCostByCurrency(subs, today)).toEqual([{ currency: "PLN", monthlyCents: 7000 }]);
   });
 
   it("rounds once per currency, not per subscription (167, not 83 + 83)", () => {
     const subs = [sub({ price: 10, billing_cycle: "yearly" }), sub({ price: 10, billing_cycle: "yearly" })];
 
-    expect(monthlyCostByCurrency(subs)).toEqual([{ currency: "PLN", monthlyCents: 167 }]);
+    expect(monthlyCostByCurrency(subs, today)).toEqual([{ currency: "PLN", monthlyCents: 167 }]);
   });
 
   it("converts prices to minor units without float drift", () => {
     const subs = [sub({ price: 19.99, billing_cycle: "monthly" }), sub({ price: 0.1, billing_cycle: "monthly" })];
 
-    expect(monthlyCostByCurrency(subs)).toEqual([{ currency: "PLN", monthlyCents: 2009 }]);
+    expect(monthlyCostByCurrency(subs, today)).toEqual([{ currency: "PLN", monthlyCents: 2009 }]);
   });
 
   it("keeps separate totals per currency, sorted by currency code", () => {
@@ -192,23 +228,85 @@ describe("monthlyCostByCurrency", () => {
       sub({ price: 12, currency: "EUR", billing_cycle: "yearly" }),
     ];
 
-    expect(monthlyCostByCurrency(subs)).toEqual([
+    expect(monthlyCostByCurrency(subs, today)).toEqual([
       { currency: "EUR", monthlyCents: 100 },
       { currency: "PLN", monthlyCents: 3000 },
     ]);
   });
 
-  it("skips cancelled subscriptions", () => {
+  it("counts a cancelled subscription whose end date is today or later", () => {
     const subs = [
       sub({ price: 30, billing_cycle: "monthly" }),
-      sub({ price: 50, billing_cycle: "monthly", status: "cancelled" }),
+      sub({ price: 30, billing_cycle: "monthly", next_renewal_date: "2026-10-02", status: "cancelled" }),
     ];
 
-    expect(monthlyCostByCurrency(subs)).toEqual([{ currency: "PLN", monthlyCents: 3000 }]);
+    expect(monthlyCostByCurrency(subs, today)).toEqual([{ currency: "PLN", monthlyCents: 6000 }]);
   });
 
-  it("returns an empty list when there are no active subscriptions", () => {
-    expect(monthlyCostByCurrency([])).toEqual([]);
-    expect(monthlyCostByCurrency([sub({ status: "cancelled" })])).toEqual([]);
+  it("skips a cancelled subscription whose end date has passed", () => {
+    const subs = [
+      sub({ price: 30, billing_cycle: "monthly" }),
+      sub({ price: 30, billing_cycle: "monthly", next_renewal_date: "2026-10-01", status: "cancelled" }),
+    ];
+
+    expect(monthlyCostByCurrency(subs, today)).toEqual([{ currency: "PLN", monthlyCents: 3000 }]);
+  });
+
+  it("returns an empty list when no subscription counts", () => {
+    expect(monthlyCostByCurrency([], today)).toEqual([]);
+    expect(monthlyCostByCurrency([sub({ next_renewal_date: "2026-09-30", status: "cancelled" })], today)).toEqual([]);
+  });
+});
+
+describe("countsToward", () => {
+  const cancelled = sub({ next_renewal_date: "2026-11-01", status: "cancelled" });
+
+  it("counts a cancelled subscription up to and including its end date", () => {
+    expect(countsToward(cancelled, "2026-10-31")).toBe(true);
+    expect(countsToward(cancelled, "2026-11-01")).toBe(true);
+  });
+
+  it("stops counting a cancelled subscription the day after its end date", () => {
+    expect(countsToward(cancelled, "2026-11-02")).toBe(false);
+  });
+
+  it("always counts an active subscription, even with a past base date", () => {
+    expect(countsToward(sub({ next_renewal_date: "2025-01-15" }), "2026-10-02")).toBe(true);
+  });
+});
+
+describe("effectiveRenewalDate", () => {
+  const today = "2026-10-02";
+
+  it("returns the stored end date of a cancelled subscription, even in the past", () => {
+    expect(effectiveRenewalDate(sub({ next_renewal_date: "2026-09-15", status: "cancelled" }), today)).toBe(
+      "2026-09-15",
+    );
+  });
+
+  it("rolls an active subscription over from its base date", () => {
+    expect(effectiveRenewalDate(sub({ billing_cycle: "monthly", next_renewal_date: "2026-01-31" }), today)).toBe(
+      "2026-10-31",
+    );
+  });
+});
+
+describe("cancellationEndDate", () => {
+  const today = "2026-10-02";
+
+  it("uses the rolled-over date of a past base, keeping the anchor day", () => {
+    expect(cancellationEndDate({ next_renewal_date: "2026-01-31", billing_cycle: "monthly" }, today)).toBe(
+      "2026-10-31",
+    );
+  });
+
+  it("keeps a future base date unchanged", () => {
+    expect(cancellationEndDate({ next_renewal_date: "2026-12-05", billing_cycle: "quarterly" }, today)).toBe(
+      "2026-12-05",
+    );
+  });
+
+  it("keeps a base date equal to today", () => {
+    expect(cancellationEndDate({ next_renewal_date: today, billing_cycle: "yearly" }, today)).toBe(today);
   });
 });

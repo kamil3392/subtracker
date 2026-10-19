@@ -60,20 +60,52 @@ export function renewalDateToStore(
   return submitted.next_renewal_date;
 }
 
-function isActive(subscription: Subscription): boolean {
-  return subscription.status === "active";
+/**
+ * FR-007: whether a subscription counts toward the monthly cost and upcoming renewals on `today`.
+ * Active entries always count. A cancelled entry counts up to and including its end date
+ * (`next_renewal_date`, frozen at cancellation) and disappears from the day after.
+ */
+export function countsToward(sub: Subscription, today: string): boolean {
+  if (sub.status === "active") {
+    return true;
+  }
+  return today <= sub.next_renewal_date;
 }
 
 /**
- * FR-008: monthly cost per currency, active subscriptions only. Prices are converted to minor units
- * first (`Math.round(price × 100)`), each is weighted by its yearly occurrence count
- * (12 / 4 / 1), and the per-currency sum is divided by 12 and rounded exactly once.
- * Sorted by currency code; empty when there are no active subscriptions.
+ * The renewal date to show or compute with — the single place that distinguishes status. Active
+ * entries roll over from their base date (FR-009); a cancelled entry keeps its stored end date as
+ * is, even when it is in the past (it will not renew, so there is nothing to roll over).
  */
-export function monthlyCostByCurrency(subs: Subscription[]): MonthlyCost[] {
+export function effectiveRenewalDate(sub: Subscription, today: string): string {
+  if (sub.status === "active") {
+    return nextRenewalDate(sub.next_renewal_date, sub.billing_cycle, today);
+  }
+  return sub.next_renewal_date;
+}
+
+/**
+ * The end date to store when an active subscription is cancelled (FR-007): its next rolled-over
+ * renewal date, i.e. the last day the already-paid period still counts.
+ */
+export function cancellationEndDate(
+  stored: Pick<Subscription, "next_renewal_date" | "billing_cycle">,
+  today: string,
+): string {
+  return nextRenewalDate(stored.next_renewal_date, stored.billing_cycle, today);
+}
+
+/**
+ * FR-008: monthly cost per currency of the subscriptions that count on `today` (FR-007: active ones,
+ * plus cancelled ones up to their end date). Prices are converted to minor units first
+ * (`Math.round(price × 100)`), each is weighted by its yearly occurrence count (12 / 4 / 1), and
+ * the per-currency sum is divided by 12 and rounded exactly once.
+ * Sorted by currency code; empty when no subscription counts.
+ */
+export function monthlyCostByCurrency(subs: Subscription[], today: string): MonthlyCost[] {
   const yearlyCentsByCurrency = new Map<string, number>();
   for (const sub of subs) {
-    if (!isActive(sub)) continue;
+    if (!countsToward(sub, today)) continue;
     const priceCents = Math.round(sub.price * 100);
     const perYear = 12 / CYCLE_MONTHS[sub.billing_cycle];
     yearlyCentsByCurrency.set(sub.currency, (yearlyCentsByCurrency.get(sub.currency) ?? 0) + priceCents * perYear);
@@ -84,16 +116,17 @@ export function monthlyCostByCurrency(subs: Subscription[]): MonthlyCost[] {
 }
 
 /**
- * Active subscriptions renewing within `[today, today + days]` (both ends inclusive), with the
- * rolled-over renewal date. Sorted by date, then by name.
+ * Subscriptions that count on `today` (FR-007) renewing within `[today, today + days]` (both ends
+ * inclusive), with their effective renewal date (rolled over for active, the end date for
+ * cancelled). Sorted by date, then by name.
  */
 export function upcomingRenewals(subs: Subscription[], today: string, days = 30): UpcomingRenewal[] {
   const windowEnd = addDays(today, days);
   return subs
-    .filter(isActive)
+    .filter((subscription) => countsToward(subscription, today))
     .map((subscription) => ({
       subscription,
-      renewalDate: nextRenewalDate(subscription.next_renewal_date, subscription.billing_cycle, today),
+      renewalDate: effectiveRenewalDate(subscription, today),
     }))
     .filter(({ renewalDate }) => renewalDate >= today && renewalDate <= windowEnd)
     .sort((a, b) =>

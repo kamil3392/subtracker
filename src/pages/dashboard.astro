@@ -4,7 +4,12 @@ import SubscriptionForm from "@/components/subscriptions/SubscriptionForm";
 import Layout from "@/layouts/Layout.astro";
 import { BILLING_CYCLE_LABELS } from "@/lib/currencies";
 import { todayInWarsaw } from "@/lib/services/dates";
-import { monthlyCostByCurrency, nextRenewalDate, upcomingRenewals } from "@/lib/services/subscriptions";
+import {
+  countsToward,
+  effectiveRenewalDate,
+  monthlyCostByCurrency,
+  upcomingRenewals,
+} from "@/lib/services/subscriptions";
 import { formValuesFromSearchParams } from "@/lib/subscription-form";
 import { createClient } from "@/lib/supabase";
 import type { Subscription } from "@/types";
@@ -30,9 +35,10 @@ if (!supabase) {
 }
 
 const today = todayInWarsaw(new Date());
-const costs = monthlyCostByCurrency(subscriptions);
+const costs = monthlyCostByCurrency(subscriptions, today);
 const renewals = upcomingRenewals(subscriptions, today);
-const isEmpty = costs.length === 0;
+// The empty state means "no entries at all"; entries that no longer count (FR-007) still show the list.
+const isEmpty = subscriptions.length === 0;
 // FR-004: every entry from the rows already loaded (no extra query), sorted by name.
 const allSubscriptions = [...subscriptions].sort((a, b) => a.name.localeCompare(b.name));
 
@@ -71,14 +77,20 @@ function formatDate(date: string): string {
             <>
               <section>
                 <h2 class="mb-3 text-lg font-semibold">Monthly cost</h2>
-                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  {costs.map(({ currency, monthlyCents }) => (
-                    <div class="rounded-xl border border-white/10 bg-white/10 p-5 backdrop-blur-xl">
-                      <p class="text-sm text-blue-100/60">{currency} per month</p>
-                      <p class="mt-1 text-2xl font-bold">{formatMoney(monthlyCents / 100, currency)}</p>
-                    </div>
-                  ))}
-                </div>
+                {costs.length === 0 ? (
+                  <p class="rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-blue-100/60">
+                    No subscriptions count toward your monthly cost right now.
+                  </p>
+                ) : (
+                  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    {costs.map(({ currency, monthlyCents }) => (
+                      <div class="rounded-xl border border-white/10 bg-white/10 p-5 backdrop-blur-xl">
+                        <p class="text-sm text-blue-100/60">{currency} per month</p>
+                        <p class="mt-1 text-2xl font-bold">{formatMoney(monthlyCents / 100, currency)}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </section>
 
               <section>
@@ -94,7 +106,10 @@ function formatDate(date: string): string {
                         <div>
                           <p class="font-medium">{subscription.name}</p>
                           <p class="text-sm text-blue-100/60">
-                            {formatDate(renewalDate)} · {BILLING_CYCLE_LABELS[subscription.billing_cycle]}
+                            {formatDate(renewalDate)} ·{" "}
+                            {subscription.status === "cancelled"
+                              ? "Cancelled, won't renew"
+                              : BILLING_CYCLE_LABELS[subscription.billing_cycle]}
                           </p>
                         </div>
                         <p class="font-semibold">{formatMoney(subscription.price, subscription.currency)}</p>
@@ -119,10 +134,9 @@ function formatDate(date: string): string {
                         {BILLING_CYCLE_LABELS[subscription.billing_cycle]}
                       </p>
                       <p class="text-sm text-blue-100/60">
-                        {/* Cancelled entries (not reachable from the UI yet) skip the rollover; FR-007 is S-03. */}
                         {subscription.status === "active"
-                          ? `Next renewal: ${formatDate(nextRenewalDate(subscription.next_renewal_date, subscription.billing_cycle, today))}`
-                          : "Cancelled"}
+                          ? `Next renewal: ${formatDate(effectiveRenewalDate(subscription, today))}`
+                          : `Cancelled · ${countsToward(subscription, today) ? "ends" : "ended"} ${formatDate(effectiveRenewalDate(subscription, today))}`}
                       </p>
                     </div>
                     <a

@@ -44,7 +44,7 @@ Osoby prywatne z wieloma subskrypcjami płacą za usługi, o których zapomniał
 | F-01 | owner-only-subscription-store   | (foundation) magazyn subskrypcji istnieje i każde konto widzi wyłącznie własne wpisy                  | —             | NFR prywatności, Access Control             | done |
 | S-01 | home-screen-cost-and-renewals   | dodać subskrypcje i na ekranie głównym zobaczyć koszt miesięczny per waluta oraz odnowienia w 30 dni | F-01          | US-01, FR-001, FR-002, FR-003, FR-008, FR-009 | done |
 | S-02 | subscription-list-and-edit      | przeglądać listę własnych subskrypcji i poprawić dowolny wpis                                        | S-01          | FR-004, FR-005                              | done |
-| S-03 | subscription-delete-and-cancel  | usunąć błędny wpis lub oznaczyć subskrypcję jako anulowaną, z poprawnym wpływem na sumę i odnowienia | S-01          | FR-006, FR-007, US-01                       | proposed |
+| S-03 | subscription-delete-and-cancel  | usunąć błędny wpis lub oznaczyć subskrypcję jako anulowaną, z poprawnym wpływem na sumę i odnowienia | S-01          | FR-006, FR-007, US-01                       | in-progress |
 
 ## Streams
 
@@ -121,7 +121,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Unknowns:**
   - Gdzie użytkownik widzi anulowane subskrypcje po wypadnięciu z sumy („zostaje w historii”) — na liście z S-02 czy osobno? — Owner: user. Block: no.
 - **Risk:** Rozszerza regułę z S-01 o status anulowania (kryterium US-01 dostosowane do FR-007 — nie odwracać); oddzielone od S-02, bo to inna reguła domenowa z własnym ryzykiem poprawności sumy.
-- **Status:** proposed
+- **Status:** in-progress
 
 ## Backlog Handoff
 

@@ -3,7 +3,7 @@ import Topbar from "@/components/Topbar.astro";
 import SubscriptionForm from "@/components/subscriptions/SubscriptionForm";
 import Layout from "@/layouts/Layout.astro";
 import { todayInWarsaw } from "@/lib/services/dates";
-import { nextRenewalDate } from "@/lib/services/subscriptions";
+import { effectiveRenewalDate } from "@/lib/services/subscriptions";
 import { formValuesFromSearchParams } from "@/lib/subscription-form";
 import { createClient } from "@/lib/supabase";
 import { parseSubscriptionId } from "@/lib/validation/subscription";
@@ -37,17 +37,13 @@ if (notFound) {
 
 let initialValues: Partial<SubscriptionFormValues> | undefined;
 if (subscription) {
-  // The form shows the rolled-over date for active entries; cancelled ones keep the stored date (FR-007 is S-03).
-  const shownDate =
-    subscription.status === "active"
-      ? nextRenewalDate(subscription.next_renewal_date, subscription.billing_cycle, todayInWarsaw(new Date()))
-      : subscription.next_renewal_date;
+  // Active entries show the rolled-over date; for a cancelled entry the date field is its end date (FR-007).
   initialValues = {
     name: subscription.name,
     price: subscription.price.toFixed(2),
     currency: subscription.currency,
     billing_cycle: subscription.billing_cycle,
-    next_renewal_date: shownDate,
+    next_renewal_date: effectiveRenewalDate(subscription, todayInWarsaw(new Date())),
     // F6: after a failed save the endpoint carries the typed values back; they win over the stored row.
     ...(error ? formValuesFromSearchParams(Astro.url.searchParams) : {}),
   };

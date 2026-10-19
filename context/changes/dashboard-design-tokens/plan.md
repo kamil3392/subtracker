@@ -464,32 +464,32 @@ Brak danych do migracji. Wycofanie = revert commitów zmiany; commity faz 3–4 
 
 #### Automated
 
-- [x] 3.1 Skan literałów (regex w „Skan”) na `src/pages/dashboard.astro src/components/dashboard/*.astro src/components/Topbar.astro src/components/form/*.tsx src/components/subscriptions/*.tsx` = 0 trafień
-- [x] 3.2 `grep -n 'bg-cosmic' src/pages/dashboard.astro src/components/dashboard/*.astro` pusty
-- [x] 3.3 Lint przechodzi: `npm run lint`
-- [x] 3.4 Typy przechodzą: `npx astro check`
-- [x] 3.5 Testy przechodzą: `npm test`
-- [x] 3.6 Build przechodzi: `npm run build`
+- [x] 3.1 Skan literałów (regex w „Skan”) na `src/pages/dashboard.astro src/components/dashboard/*.astro src/components/Topbar.astro src/components/form/*.tsx src/components/subscriptions/*.tsx` = 0 trafień — 31d6efe
+- [x] 3.2 `grep -n 'bg-cosmic' src/pages/dashboard.astro src/components/dashboard/*.astro` pusty — 31d6efe
+- [x] 3.3 Lint przechodzi: `npm run lint` — 31d6efe
+- [x] 3.4 Typy przechodzą: `npx astro check` — 31d6efe
+- [x] 3.5 Testy przechodzą: `npm test` — 31d6efe
+- [x] 3.6 Build przechodzi: `npm run build` — 31d6efe
 
 #### Manual
 
-- [x] 3.7 Zrzut dashboardu desktop 1280 px i mobile 375 px — jasny, czytelny, bez poziomego scrolla na 375 px
+- [x] 3.7 Zrzut dashboardu desktop 1280 px i mobile 375 px — jasny, czytelny, bez poziomego scrolla na 375 px — 31d6efe
 - [ ] 3.8 Dialog Cancel/Delete otwiera się w jasnych tokenach, „Keep” i potwierdzenie czytelne
 
 ### Phase 4: Pozostałe strony
 
 #### Automated
 
-- [ ] 4.1 Skan literałów na `src/pages/**/*.astro` i `src/components/**/*.{astro,tsx}` poza `src/components/ui/**` = 0 trafień
-- [ ] 4.2 `grep -rn 'bg-cosmic' src` nie zwraca trafień
-- [ ] 4.3 Lint przechodzi: `npm run lint`
-- [ ] 4.4 Typy przechodzą: `npx astro check`
-- [ ] 4.5 Testy przechodzą: `npm test`
-- [ ] 4.6 Build przechodzi: `npm run build`
+- [x] 4.1 Skan literałów na `src/pages/**/*.astro` i `src/components/**/*.{astro,tsx}` poza `src/components/ui/**` = 0 trafień
+- [x] 4.2 `grep -rn 'bg-cosmic' src` nie zwraca trafień
+- [x] 4.3 Lint przechodzi: `npm run lint`
+- [x] 4.4 Typy przechodzą: `npx astro check`
+- [x] 4.5 Testy przechodzą: `npm test`
+- [x] 4.6 Build przechodzi: `npm run build`
 
 #### Manual
 
-- [ ] 4.7 Zrzuty desktop 1280 px i mobile 375 px stron `/`, `/auth/signin`, `/auth/signup`, `/auth/confirm-email` — jasne, czytelne, bez poziomego scrolla
+- [x] 4.7 Zrzuty desktop 1280 px i mobile 375 px stron `/`, `/auth/signin`, `/auth/signup`, `/auth/confirm-email` — jasne, czytelne, bez poziomego scrolla
 - [ ] 4.8 Strona edycji (stan „not found” lokalnie, formularz po wdrożeniu) — jasna i czytelna
 - [ ] 4.9 Smoke w CI zielony po pushu commitów faz 3–4
 

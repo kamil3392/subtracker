@@ -1,11 +1,15 @@
 ---
 import Topbar from "@/components/Topbar.astro";
 import SubscriptionForm from "@/components/subscriptions/SubscriptionForm";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { buttonVariants } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import Layout from "@/layouts/Layout.astro";
 import { todayInWarsaw } from "@/lib/services/dates";
 import { effectiveRenewalDate } from "@/lib/services/subscriptions";
 import { formValuesFromSearchParams } from "@/lib/subscription-form";
 import { createClient } from "@/lib/supabase";
+import { cn } from "@/lib/utils";
 import { parseSubscriptionId } from "@/lib/validation/subscription";
 import type { Subscription, SubscriptionFormValues } from "@/types";
 
@@ -48,53 +52,62 @@ if (subscription) {
     ...(error ? formValuesFromSearchParams(Astro.url.searchParams) : {}),
   };
 }
+
+// Inline text links: the `link` variant's colour and focus ring without the button box.
+const linkClass = cn(buttonVariants({ variant: "link" }), "h-auto p-0");
 ---
 
 <Layout title="Edit subscription">
-  <div class="bg-cosmic relative min-h-screen w-full overflow-hidden">
-    <div class="relative z-10 p-4 sm:p-8">
-      <Topbar />
+  <div class="min-h-screen w-full p-4 sm:p-8">
+    <Topbar />
 
-      <div class="mx-auto max-w-xl space-y-6 py-6 text-white">
-        <a href="/dashboard" class="text-sm text-purple-300 transition-colors hover:text-purple-100 hover:underline">
-          ← Back to dashboard
-        </a>
+    <div class="mx-auto max-w-xl space-y-6 py-6">
+      <a href="/dashboard" class:list={linkClass}>
+        ← Back to dashboard
+      </a>
 
-        <h1 class="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-3xl font-bold text-transparent">
-          Edit subscription
-        </h1>
+      <h1 class="text-3xl font-bold text-foreground">Edit subscription</h1>
 
-        {loadError ? (
-          <p class="rounded-xl border border-red-500/30 bg-red-900/30 px-4 py-3 text-sm text-red-300">{loadError}</p>
-        ) : subscription ? (
-          <section class="rounded-2xl border border-white/10 bg-white/10 p-6 backdrop-blur-xl">
-            {subscription.status === "cancelled" && (
-              <p class="mb-4 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-blue-100/70">
-                This subscription is cancelled — its end date and billing cycle stay as they are.
+      {loadError ? (
+        <Alert variant="destructive">
+          <AlertDescription>{loadError}</AlertDescription>
+        </Alert>
+      ) : subscription ? (
+        <section>
+          <Card>
+            <CardContent>
+              {subscription.status === "cancelled" && (
+                <p class="mb-4 rounded-lg border border-border bg-muted px-3 py-2 text-sm text-muted-foreground">
+                  This subscription is cancelled — its end date and billing cycle stay as they are.
+                </p>
+              )}
+              <SubscriptionForm
+                action={`/api/subscriptions/${subscription.id}`}
+                submitLabel="Save changes"
+                pendingText="Saving..."
+                submitIcon="save"
+                initialValues={initialValues}
+                serverError={error}
+                client:load
+              />
+            </CardContent>
+          </Card>
+        </section>
+      ) : (
+        <section>
+          <Card className="text-center">
+            <CardContent>
+              <h2 class="mb-2 text-lg font-semibold">Subscription not found</h2>
+              <p class="text-sm text-muted-foreground">
+                It may have been removed, or it belongs to another account.{" "}
+                <a href="/dashboard" class:list={linkClass}>
+                  Go to dashboard
+                </a>
               </p>
-            )}
-            <SubscriptionForm
-              action={`/api/subscriptions/${subscription.id}`}
-              submitLabel="Save changes"
-              pendingText="Saving..."
-              submitIcon="save"
-              initialValues={initialValues}
-              serverError={error}
-              client:load
-            />
-          </section>
-        ) : (
-          <section class="rounded-2xl border border-white/10 bg-white/10 p-8 text-center backdrop-blur-xl">
-            <h2 class="mb-2 text-lg font-semibold">Subscription not found</h2>
-            <p class="text-sm text-blue-100/60">
-              It may have been removed, or it belongs to another account.{" "}
-              <a href="/dashboard" class="text-purple-300 hover:underline">
-                Go to dashboard
-              </a>
-            </p>
-          </section>
-        )}
-      </div>
+            </CardContent>
+          </Card>
+        </section>
+      )}
     </div>
   </div>
 </Layout>

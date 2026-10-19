@@ -1,5 +1,8 @@
 ---
 import Layout from "@/layouts/Layout.astro";
+import { buttonVariants } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 const isAutoConfirmed = import.meta.env.DEV;
 
@@ -16,19 +19,21 @@ const content = isAutoConfirmed
       description: "We've sent a confirmation link to your email address. Click it to activate your account.",
       linkText: "Back to sign in",
     };
+// Inline text link: the `link` variant's colour and focus ring without the button box.
+const linkClass = cn(buttonVariants({ variant: "link" }), "h-auto p-0");
 ---
 
 <Layout title={content.heading}>
-  <div class="bg-cosmic flex min-h-screen items-center justify-center p-4">
-    <div class="w-full max-w-sm rounded-2xl border border-white/10 bg-white/10 p-8 text-center text-white backdrop-blur-xl">
-      <div class="mb-4 text-5xl">{content.emoji}</div>
-      <h1 class="mb-3 bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-2xl font-bold text-transparent">
-        {content.heading}
-      </h1>
-      <p class="mb-6 text-blue-100/80">{content.description}</p>
-      <a href="/auth/signin" class="text-sm text-purple-300 hover:underline">
-        {content.linkText}
-      </a>
-    </div>
+  <div class="flex min-h-screen items-center justify-center p-4">
+    <Card className="w-full max-w-sm text-center">
+      <CardContent>
+        <div class="mb-4 text-5xl">{content.emoji}</div>
+        <h1 class="mb-3 text-2xl font-bold text-foreground">{content.heading}</h1>
+        <p class="mb-6 text-muted-foreground">{content.description}</p>
+        <a href="/auth/signin" class:list={linkClass}>
+          {content.linkText}
+        </a>
+      </CardContent>
+    </Card>
   </div>
 </Layout>

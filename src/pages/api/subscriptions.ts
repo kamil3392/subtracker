@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { formErrorLocation } from "@/lib/subscription-form";
 import { createClient } from "@/lib/supabase";
 import { parseNewSubscription } from "@/lib/validation/subscription";
 
@@ -16,15 +17,17 @@ export const POST: APIRoute = async (context) => {
     return redirectWithError(context, "Supabase is not configured");
   }
 
-  const parsed = parseNewSubscription(await context.request.formData());
+  const form = await context.request.formData();
+  const parsed = parseNewSubscription(form);
   if (!parsed.success) {
-    return redirectWithError(context, parsed.error);
+    // F6: carry the typed values back so the form keeps them after the redirect.
+    return context.redirect(formErrorLocation("/dashboard", parsed.error, form));
   }
 
   // `user_id` defaults to auth.uid(); the RLS insert policy rejects any other owner.
   const { error } = await supabase.from("subscriptions").insert(parsed.data);
   if (error) {
-    return redirectWithError(context, "Could not save the subscription");
+    return context.redirect(formErrorLocation("/dashboard", "Could not save the subscription", form));
   }
 
   return context.redirect("/dashboard");

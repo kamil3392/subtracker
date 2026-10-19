@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { CalendarDays, Coins, Plus, Tag } from "lucide-react";
-import { FormField } from "@/components/auth/FormField";
-import { SubmitButton } from "@/components/auth/SubmitButton";
-import { ServerError } from "@/components/auth/ServerError";
+import { CalendarDays, Coins, Plus, Save, Tag } from "lucide-react";
+import { FormField } from "@/components/form/FormField";
+import { SubmitButton } from "@/components/form/SubmitButton";
+import { ServerError } from "@/components/form/ServerError";
 import { Constants } from "@/db/database.types";
-import { BILLING_CYCLE_LABELS, SUPPORTED_CURRENCIES } from "@/lib/currencies";
+import { BILLING_CYCLE_LABELS, SUPPORTED_CURRENCIES, type SupportedCurrency } from "@/lib/currencies";
 import { RENEWAL_DATE_MAX, RENEWAL_DATE_MIN } from "@/lib/services/dates";
-import type { BillingCycle } from "@/types";
+import type { BillingCycle, SubscriptionFormValues } from "@/types";
 
 // Mirrors the server-side rules in `src/lib/validation/subscription.ts` without importing zod into the client bundle.
 const MAX_NAME_LENGTH = 100;
@@ -26,18 +26,53 @@ function isCalendarDate(value: string): boolean {
   return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day;
 }
 
+const DEFAULT_CURRENCY: SupportedCurrency = "PLN";
+const DEFAULT_BILLING_CYCLE: BillingCycle = "monthly";
+
+function isSupportedCurrency(value: string | undefined): value is SupportedCurrency {
+  return (SUPPORTED_CURRENCIES as readonly (string | undefined)[]).includes(value);
+}
+
+function isBillingCycle(value: string | undefined): value is BillingCycle {
+  return (Constants.public.Enums.billing_cycle as readonly (string | undefined)[]).includes(value);
+}
+
+// Serializable icon keys: an `.astro` page cannot pass a React element into a `client:load` island.
+const SUBMIT_ICONS = {
+  plus: Plus,
+  save: Save,
+} as const;
+
 interface Props {
+  action: string;
+  submitLabel: string;
+  pendingText: string;
+  submitIcon?: keyof typeof SUBMIT_ICONS;
+  initialValues?: Partial<SubscriptionFormValues>;
   serverError?: string | null;
 }
 
 type Field = "name" | "price" | "next_renewal_date";
 
-export default function AddSubscriptionForm({ serverError }: Props) {
-  const [name, setName] = useState("");
-  const [price, setPrice] = useState("");
-  const [currency, setCurrency] = useState<string>("PLN");
-  const [billingCycle, setBillingCycle] = useState<BillingCycle>("monthly");
-  const [nextRenewalDate, setNextRenewalDate] = useState("");
+export default function SubscriptionForm({
+  action,
+  submitLabel,
+  pendingText,
+  submitIcon = "plus",
+  initialValues,
+  serverError,
+}: Props) {
+  const [name, setName] = useState(initialValues?.name ?? "");
+  const [price, setPrice] = useState(initialValues?.price ?? "");
+  // A select cannot show a value outside its options, so unknown carried values fall back to the defaults.
+  const [currency, setCurrency] = useState<string>(
+    isSupportedCurrency(initialValues?.currency) ? initialValues.currency : DEFAULT_CURRENCY,
+  );
+  const [billingCycle, setBillingCycle] = useState<BillingCycle>(
+    isBillingCycle(initialValues?.billing_cycle) ? initialValues.billing_cycle : DEFAULT_BILLING_CYCLE,
+  );
+  const [nextRenewalDate, setNextRenewalDate] = useState(initialValues?.next_renewal_date ?? "");
+  const SubmitIcon = SUBMIT_ICONS[submitIcon];
   const [errors, setErrors] = useState<Partial<Record<Field, string>>>({});
 
   function validate() {
@@ -82,7 +117,7 @@ export default function AddSubscriptionForm({ serverError }: Props) {
   }
 
   return (
-    <form method="POST" action="/api/subscriptions" className="space-y-4" onSubmit={handleSubmit} noValidate>
+    <form method="POST" action={action} className="space-y-4" onSubmit={handleSubmit} noValidate>
       <FormField
         id="name"
         label="Name"
@@ -169,8 +204,8 @@ export default function AddSubscriptionForm({ serverError }: Props) {
 
       <ServerError message={serverError} />
 
-      <SubmitButton pendingText="Saving..." icon={<Plus className="size-4" />}>
-        Add subscription
+      <SubmitButton pendingText={pendingText} icon={<SubmitIcon className="size-4" />}>
+        {submitLabel}
       </SubmitButton>
     </form>
   );

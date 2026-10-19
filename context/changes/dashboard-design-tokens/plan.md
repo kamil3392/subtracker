@@ -497,28 +497,28 @@ Brak danych do migracji. Wycofanie = revert commitów zmiany; commity faz 3–4 
 
 #### Automated
 
-- [x] 5.1 `npm run build` przechodzi, a w `npm run preview` żądanie `GET /dev/dashboard-states` zwraca 404
-- [x] 5.2 W `npm run dev` żądanie `GET /dev/dashboard-states` zwraca 200
-- [x] 5.3 `grep -rnE '\bfocus:(ring|border|outline)' src/components src/pages` nie zwraca trafień
-- [x] 5.4 Skan literałów na plikach z fazy 4 + `src/pages/dev/*.astro` + `src/components/dashboard/*` = 0
-- [x] 5.5 Lint przechodzi: `npm run lint`
-- [x] 5.6 Typy przechodzą: `npx astro check`
-- [x] 5.7 Testy przechodzą: `npm test`
+- [x] 5.1 `npm run build` przechodzi, a w `npm run preview` żądanie `GET /dev/dashboard-states` zwraca 404 — 4cb23b8
+- [x] 5.2 W `npm run dev` żądanie `GET /dev/dashboard-states` zwraca 200 — 4cb23b8
+- [x] 5.3 `grep -rnE '\bfocus:(ring|border|outline)' src/components src/pages` nie zwraca trafień — 4cb23b8
+- [x] 5.4 Skan literałów na plikach z fazy 4 + `src/pages/dev/*.astro` + `src/components/dashboard/*` = 0 — 4cb23b8
+- [x] 5.5 Lint przechodzi: `npm run lint` — 4cb23b8
+- [x] 5.6 Typy przechodzą: `npx astro check` — 4cb23b8
+- [x] 5.7 Testy przechodzą: `npm test` — 4cb23b8
 
 #### Manual
 
-- [x] 5.8 Kitchen sink, zrzuty desktop 1280 px i mobile 375 px: każda komórka macierzy 7 stanów pokazana albo oznaczona N/A z powodem
-- [x] 5.9 Tab przez cały dashboard: fokus widoczny na każdej kontrolce, w tym na „Delete” i linkach
-- [x] 5.10 Czytnik ekranu lub drzewo dostępności: błąd pola opisany, przyciski wiersza z nazwą subskrypcji, zapis ogłasza stan
+- [x] 5.8 Kitchen sink, zrzuty desktop 1280 px i mobile 375 px: każda komórka macierzy 7 stanów pokazana albo oznaczona N/A z powodem — 4cb23b8
+- [x] 5.9 Tab przez cały dashboard: fokus widoczny na każdej kontrolce, w tym na „Delete” i linkach — 4cb23b8
+- [x] 5.10 Czytnik ekranu lub drzewo dostępności: błąd pola opisany, przyciski wiersza z nazwą subskrypcji, zapis ogłasza stan — 4cb23b8
 
 ### Phase 6: Zabezpieczenie kontraktu
 
 #### Automated
 
-- [ ] 6.1 `npm run lint` przechodzi (eslint + kontrola literałów)
-- [ ] 6.2 Kontrola łapie regresję: tymczasowe `text-white` w `src/pages/dashboard.astro` daje kod wyjścia 1 z `plik:linia`
-- [ ] 6.3 `grep -n 'check-ui-literals' package.json CLAUDE.md` zwraca trafienia w obu plikach
+- [x] 6.1 `npm run lint` przechodzi (eslint + kontrola literałów)
+- [x] 6.2 Kontrola łapie regresję: tymczasowe `text-white` w `src/pages/dashboard.astro` daje kod wyjścia 1 z `plik:linia`
+- [x] 6.3 `grep -n 'check-ui-literals' package.json CLAUDE.md` zwraca trafienia w obu plikach
 
 #### Manual
 
-- [ ] 6.4 Blok UI w `CLAUDE.md` jest zwięzły i wskazuje tokeny, komponenty, kitchen sink i kontrolę
+- [x] 6.4 Blok UI w `CLAUDE.md` jest zwięzły i wskazuje tokeny, komponenty, kitchen sink i kontrolę

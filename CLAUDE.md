@@ -27,6 +27,7 @@ Standardowe skrypty (`dev`, `build`, `preview`, `lint`, `format`, `test`, `smoke
 - `npx astro sync` generuje `.astro/types.d.ts` — uruchom na świeżym checkoucie **przed** `lint`/`check`, inaczej type-checked lint zgłasza fałszywe błędy.
 - `npx astro check` sprawdza typy w `.astro` i `.ts`; CI to uruchamia, ale nie ma skryptu npm.
 - `npx shadcn@latest add <name>` dodaje komponent shadcn/ui do `src/components/ui/`.
+- `npm run lint` = `eslint .` + `scripts/check-ui-literals.mjs` (kontrola literałów UI, patrz „UI”); lint-staged odpala tylko eslint.
 
 **Testy**: testy jednostkowe na vitest (`vitest.config.ts`: środowisko `node`, alias `@`) leżą obok kodu jako `src/**/*.test.ts` i importują `describe`/`it`/`expect` jawnie z `vitest` (bez globals); pliki testów są lintowane type-aware jak reszta `src/`. Wszystkie: `npm test`; pojedynczy plik: `npx vitest run <ścieżka>`. Job `ci` uruchamia `npm test` po `npm run lint`. Poza tym testy bazy pgTAP w `supabase/tests/` (`npx supabase test db` przeciw działającemu lokalnemu Supabase; RLS i ograniczenia `public.subscriptions`) oraz `scripts/smoke.mjs` (przepływ auth, dodanie subskrypcji z jej widocznością na `/dashboard`, jej edycja, anulowanie i usunięcie — w tym 404/redirect dla obcego id, po HTTP przeciw **działającemu** serwerowi; wymagania w @README.md) — obie uruchamia job `smoke` w CI.
 
@@ -39,9 +40,19 @@ Standardowe skrypty (`dev`, `build`, `preview`, `lint`, `format`, `test`, `smoke
 ### Rendering i runtime
 
 - React wyłącznie jako wyspy (`client:load` w plikach `.astro`) tam, gdzie potrzebna jest interaktywność; treść statyczna i layout w `.astro`. Żadnych dyrektyw Next.js (`"use client"`).
-- Tailwind 4 przez plugin Vite — nie ma `tailwind.config`; tokeny kolorów (oklch, tryb `.dark`) i warianty żyją w `src/styles/global.css`. Klasy warunkowe łącz przez `cn()` z `@/lib/utils`, nie konkatenacją stringów.
-- shadcn/ui w stylu `new-york` (`components.json`), komponenty w `src/components/ui/`, ikony z `lucide-react`.
+- Tailwind 4 przez plugin Vite — nie ma `tailwind.config`; tokeny i warianty w `src/styles/global.css` (zasady w „UI”). Klasy warunkowe łącz przez `cn()` z `@/lib/utils`, nie konkatenacją stringów.
+- shadcn/ui w stylu `new-york` (`components.json`), ikony z `lucide-react`.
 - Alias `@/*` → `./src/*`.
+
+### UI
+
+- Tokeny w `src/styles/global.css`: `:root` = jasny motyw (shadcn new-york/neutral, nadpisany tylko `--ring`; uzasadnienie w `context/changes/dashboard-design-tokens/tokens.md`), publikowane przez `@theme inline`; `.dark` istnieje, ale jest nieużywany.
+- Komponenty w `src/components/ui/` (button, card, input, label, alert, alert-dialog) — sprawdź tam przed utworzeniem własnego; brakujący dodaj `npx shadcn@latest add <name>`.
+- W widokach (`src/pages/`, `src/components/` poza `ui/`) żadnych klas palety (`text-white`, `bg-red-500`…), hex/rgb/hsl/oklch ani wartości arbitralnych `-[Npx]`/`-[Nrem]` — tylko role: `bg-card`, `text-muted-foreground`, `text-destructive` itd. Zamiast `ring-[3px]` pisz `ring-3`.
+- Pierścienie fokusu w `ui/*` mają pełne krycie (`ring-ring`, `ring-destructive`) — nie przywracaj `/50` ani `/20`.
+- W `.astro` Radix `asChild` nie działa (dzieci to statyczny HTML): link/przycisk stylizuj `class:list={buttonVariants({ variant, size })}` z `@/components/ui/button` na zwykłym `<a>`/`<button>`.
+- Widok dashboardu to `src/components/dashboard/DashboardView.astro` (czysty widok z propsów; dane ładuje `src/pages/dashboard.astro`). Kitchen sink wszystkich stanów: `/dev/dashboard-states` (fikstury w `src/components/dashboard/fixtures.ts`, tylko `astro dev`) — nowy stan widoku dodaj tam.
+- Kontrola: `npm run lint` uruchamia `scripts/check-ui-literals.mjs`, który wypisuje `plik:linia` i kończy się kodem 1 przy literale.
 
 ### Zmienne środowiskowe
 
@@ -50,7 +61,7 @@ Standardowe skrypty (`dev`, `build`, `preview`, `lint`, `format`, `test`, `smoke
 
 ### Przepływ auth (wzorzec do naśladowania dla nowych akcji)
 
-1. `src/middleware.ts` na każdym żądaniu tworzy klienta Supabase SSR (sesja w cookies przez `@supabase/ssr`), wpisuje użytkownika do `Astro.locals.user` (typ w `src/env.d.ts`) i przekierowuje na `/auth/signin` dla ścieżek z `PROTECTED_ROUTES` (dopasowanie po prefiksie `startsWith`; dziś `/dashboard`, `/api/subscriptions` i `/subscriptions`). Nowe strony i endpointy chronione dopisz do tej tablicy. Middleware przekierowuje też zalogowanego z `/` na `/dashboard` — rób takie redirecty tutaj, nie przez `return Astro.redirect()` we frontmatterze strony (crash reguły `no-misused-promises`).
+1. `src/middleware.ts` na każdym żądaniu tworzy klienta Supabase SSR (sesja w cookies przez `@supabase/ssr`), wpisuje użytkownika do `Astro.locals.user` (typ w `src/env.d.ts`) i przekierowuje na `/auth/signin` dla ścieżek z `PROTECTED_ROUTES` (dopasowanie po prefiksie `startsWith`; dziś `/dashboard`, `/api/subscriptions` i `/subscriptions`). Nowe strony i endpointy chronione dopisz do tej tablicy. Ścieżki z `DEV_ONLY_ROUTES` (dziś `/dev/`) dostają 404 poza `astro dev`. Middleware przekierowuje też zalogowanego z `/` na `/dashboard` — rób takie redirecty tutaj, nie przez `return Astro.redirect()` we frontmatterze strony (crash reguły `no-misused-promises`).
 2. Formularze to wyspy React (`src/components/auth/SignInForm.tsx` + `PasswordToggle`, `src/components/subscriptions/SubscriptionForm.tsx`, `src/components/subscriptions/SubscriptionActions.tsx` — przyciski Cancel/Delete z `AlertDialog` i formularzem POST; wspólne `FormField`, `SubmitButton`, `ServerError` w `src/components/form/`) robiące **tylko** walidację po stronie klienta; wysyłają natywny `<form method="POST" action="/api/...">` — bez `fetch` i bez JSON.
 3. Endpointy w `src/pages/api/**/*.ts` (`auth/*`, `subscriptions.ts`, `subscriptions/[id].ts`, `subscriptions/[id]/cancel.ts`, `subscriptions/[id]/delete.ts`; wspólne redirecty błędów w `src/lib/api-redirects.ts`) eksportują `POST: APIRoute`, czytają `request.formData()` i komunikują wynik **redirectem**: sukces → strona docelowa, błąd → `redirect("<strona formularza>?error=" + encodeURIComponent(msg))` (np. `/auth/signin`, `/dashboard`, `/subscriptions/<id>/edit`). Endpointy domenowe walidują wejście zod-em (`src/lib/validation/`) i nie przekazują surowych komunikatów bazy. Strona `.astro` czyta `Astro.url.searchParams.get("error")` i przekazuje go do wyspy jako `serverError`. Na `/dashboard` `?error=` z przeniesionymi polami formularza (tylko `formErrorLocation`) trafia do formularza „Add”, a bez nich — do banera strony (błędy akcji na wpisach).
 4. Wylogowanie i akcje w `Topbar.astro` to również formularze POST — nie linki GET.

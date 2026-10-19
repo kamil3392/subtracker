@@ -1,21 +1,31 @@
-import type { ReactNode } from "react";
-import { useFormStatus } from "react-dom";
+import { useRef, type ComponentProps, type ReactNode } from "react";
+import { useNativeFormPending } from "@/components/hooks/useNativeFormPending";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+
+const PRIMARY_CLASSES =
+  "w-full rounded-lg bg-purple-600 px-4 py-2 font-medium text-white transition-colors hover:bg-purple-500";
 
 interface SubmitButtonProps {
   pendingText: string;
   icon: ReactNode;
   children: ReactNode;
+  /** Without a variant the button keeps the app's primary (purple, full-width) look. */
+  variant?: ComponentProps<typeof Button>["variant"];
+  className?: string;
 }
 
-export function SubmitButton({ pendingText, icon, children }: SubmitButtonProps) {
-  const { pending } = useFormStatus();
+export function SubmitButton({ pendingText, icon, children, variant, className }: SubmitButtonProps) {
+  const ref = useRef<HTMLButtonElement>(null);
+  const pending = useNativeFormPending(ref);
 
   return (
     <Button
+      ref={ref}
       type="submit"
+      variant={variant}
       disabled={pending}
-      className="w-full rounded-lg bg-purple-600 px-4 py-2 font-medium text-white transition-colors hover:bg-purple-500"
+      className={cn(variant ? undefined : PRIMARY_CLASSES, className)}
     >
       {pending ? (
         <span className="flex items-center gap-2">

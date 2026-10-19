@@ -52,7 +52,7 @@ Standardowe skrypty (`dev`, `build`, `preview`, `lint`, `format`, `test`, `smoke
 
 1. `src/middleware.ts` na każdym żądaniu tworzy klienta Supabase SSR (sesja w cookies przez `@supabase/ssr`), wpisuje użytkownika do `Astro.locals.user` (typ w `src/env.d.ts`) i przekierowuje na `/auth/signin` dla ścieżek z `PROTECTED_ROUTES` (dopasowanie po prefiksie `startsWith`; dziś `/dashboard`, `/api/subscriptions` i `/subscriptions`). Nowe strony i endpointy chronione dopisz do tej tablicy. Middleware przekierowuje też zalogowanego z `/` na `/dashboard` — rób takie redirecty tutaj, nie przez `return Astro.redirect()` we frontmatterze strony (crash reguły `no-misused-promises`).
 2. Formularze to wyspy React (`src/components/auth/SignInForm.tsx` + `PasswordToggle`, `src/components/subscriptions/SubscriptionForm.tsx`, `src/components/subscriptions/SubscriptionActions.tsx` — przyciski Cancel/Delete z `AlertDialog` i formularzem POST; wspólne `FormField`, `SubmitButton`, `ServerError` w `src/components/form/`) robiące **tylko** walidację po stronie klienta; wysyłają natywny `<form method="POST" action="/api/...">` — bez `fetch` i bez JSON.
-3. Endpointy w `src/pages/api/**/*.ts` (`auth/*`, `subscriptions.ts`, `subscriptions/[id].ts`, `subscriptions/[id]/cancel.ts`, `subscriptions/[id]/delete.ts`; wspólne redirecty błędów w `src/lib/api-redirects.ts`) eksportują `POST: APIRoute`, czytają `request.formData()` i komunikują wynik **redirectem**: sukces → strona docelowa, błąd → `redirect("<strona formularza>?error=" + encodeURIComponent(msg))` (np. `/auth/signin`, `/dashboard`, `/subscriptions/<id>/edit`). Endpointy domenowe walidują wejście zod-em (`src/lib/validation/`) i nie przekazują surowych komunikatów bazy. Strona `.astro` czyta `Astro.url.searchParams.get("error")` i przekazuje go do wyspy jako `serverError`.
+3. Endpointy w `src/pages/api/**/*.ts` (`auth/*`, `subscriptions.ts`, `subscriptions/[id].ts`, `subscriptions/[id]/cancel.ts`, `subscriptions/[id]/delete.ts`; wspólne redirecty błędów w `src/lib/api-redirects.ts`) eksportują `POST: APIRoute`, czytają `request.formData()` i komunikują wynik **redirectem**: sukces → strona docelowa, błąd → `redirect("<strona formularza>?error=" + encodeURIComponent(msg))` (np. `/auth/signin`, `/dashboard`, `/subscriptions/<id>/edit`). Endpointy domenowe walidują wejście zod-em (`src/lib/validation/`) i nie przekazują surowych komunikatów bazy. Strona `.astro` czyta `Astro.url.searchParams.get("error")` i przekazuje go do wyspy jako `serverError`. Na `/dashboard` `?error=` z przeniesionymi polami formularza (tylko `formErrorLocation`) trafia do formularza „Add”, a bez nich — do banera strony (błędy akcji na wpisach).
 4. Wylogowanie i akcje w `Topbar.astro` to również formularze POST — nie linki GET.
 
 ### Dane i logika domenowa
@@ -70,47 +70,3 @@ Standardowe skrypty (`dev`, `build`, `preview`, `lint`, `format`, `test`, `smoke
 
 - `context/foundation/` — `prd.md`, `tech-stack.md`, `shape-notes.md` (wejścia z wcześniejszych lekcji; `lessons.md` powstanie przy pierwszym `/10x-lesson`); `course-notes.md` — materiał lekcji z 10x CLI, nie zasady.
 - `context/changes/` — logi zmian, np. `bootstrap-verification/verification.md` (pełny zapis scaffoldu i audytu `npm audit`).
-<!-- BEGIN @przeprogramowani/10x-cli -->
-
-## Zestaw narzędzi AI 10xDevs — Moduł 2, Lekcja 3
-
-Przejrzyj kod wygenerowany przez AI przed scaleniem, korzystając z **łańcucha przeglądu implementacji**:
-
-```
-/10x-implement -> /10x-impl-review -> triage -> (/10x-lesson | fix | skip | disagree)
-```
-
-`/10x-impl-review` jest głównym tematem lekcji. Przegląd jest bramką jakości, a nie poleceniem naprawienia każdego znaleziska.
-
-### Router zadań — od czego zacząć
-
-| Umiejętność | Użyj jej, gdy |
-| --- | --- |
-| **Przegląd kodu (główny temat lekcji)** | |
-| `/10x-impl-review <change-id>` | Zaimplementowano kod i chcesz przeprowadzić ustrukturyzowany przegląd przed scaleniem. Umiejętność sprawdza zgodność z planem, dyscyplinę zakresu, bezpieczeństwo i jakość, architekturę, spójność wzorców oraz kryteria sukcesu, a następnie przedstawia ustalenia do selekcji. |
-| **Wynik powtarzającej się lekcji** | |
-| `/10x-lesson` | Ustalenie ujawnia powtarzającą się regułę projektu lub wzorzec błędów agenta. Zapisz je w `context/foundation/lessons.md` zamiast traktować je jako jednorazową notatkę. |
-
-### Dyscyplina selekcji
-
-- Dotkliwość określa, jak poważne jest ustalenie. Wpływ określa, jak duże znaczenie ma teraz decyzja.
-- Prawidłowe wyniki: napraw teraz, napraw inaczej, pomiń, zaakceptuj jako ryzyko, zapisz jako powtarzającą się regułę (`/10x-lesson`), nie zgódź się.
-- Naprawiaj krytyczne ustalenia. Nie poświęcaj godzin na obserwacje o niskim wpływie tylko dlatego, że agent je znalazł.
-- Świadome pomijanie ustaleń o niskim wpływie jest prawidłowym wynikiem przeglądu, a nie zaniedbaniem.
-- Jeśli nie zgadzasz się z ustaleniem, zapisz dlaczego. Błędne rozumowanie agenta również jest sygnałem.
-
-### Granice przeglądu
-
-- Ta lekcja dotyczy przeglądu zaimplementowanego kodu. Nie tworzy planu, nie wykonuje nowych faz ani nie uczy przeglądu CI.
-- Strategia testowania i bramki jakości zostaną wprowadzone w Module 3.
-- Nie używaj `/10x-contract` jako wyniku selekcji w tej lekcji.
-
-### Ścieżki używane przez tę lekcję
-
-- `context/changes/<change-id>/plan.md` — oczekiwany kontrakt implementacji
-- `context/changes/<change-id>/reviews/` — wynik przeglądu
-- `context/foundation/lessons.md` — powtarzające się lekcje
-
-Umiejętności nie mogą zapisywać do `context/archive/`. Zarchiwizowane zmiany są niezmienne; jeśli rozwiązana ścieżka docelowa zaczyna się od `context/archive/`, przerwij z komunikatem: "Ta zmiana jest zarchiwizowana. Zamiast tego otwórz nową zmianę za pomocą `/10x-new`."
-
-<!-- END @przeprogramowani/10x-cli -->

@@ -1,11 +1,8 @@
 import type { APIRoute } from "astro";
+import { redirectToDashboardWithError } from "@/lib/api-redirects";
 import { formErrorLocation } from "@/lib/subscription-form";
 import { createClient } from "@/lib/supabase";
 import { parseNewSubscription } from "@/lib/validation/subscription";
-
-function redirectWithError(context: Parameters<APIRoute>[0], message: string) {
-  return context.redirect(`/dashboard?error=${encodeURIComponent(message)}`);
-}
 
 export const POST: APIRoute = async (context) => {
   if (!context.locals.user) {
@@ -14,7 +11,7 @@ export const POST: APIRoute = async (context) => {
 
   const supabase = createClient(context.request.headers, context.cookies);
   if (!supabase) {
-    return redirectWithError(context, "Supabase is not configured");
+    return redirectToDashboardWithError(context, "Supabase is not configured");
   }
 
   const form = await context.request.formData();

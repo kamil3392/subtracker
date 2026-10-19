@@ -32,7 +32,7 @@ export const POST: APIRoute = async (context) => {
   // RLS restricts the select to the owner's rows: another account's id reads as "not found".
   const { data: existing, error: selectError } = await supabase
     .from("subscriptions")
-    .select("next_renewal_date, billing_cycle")
+    .select("status, next_renewal_date, billing_cycle")
     .eq("id", id)
     .maybeSingle();
   if (selectError) {
@@ -43,17 +43,25 @@ export const POST: APIRoute = async (context) => {
   }
 
   const { name, price, currency, billing_cycle, next_renewal_date } = parsed.data;
+  // FR-007: a cancelled entry's end date (and cycle) is frozen at cancellation; edits keep it.
+  const schedule =
+    existing.status === "cancelled"
+      ? { billing_cycle: existing.billing_cycle, next_renewal_date: existing.next_renewal_date }
+      : {
+          billing_cycle,
+          next_renewal_date: renewalDateToStore(
+            existing,
+            { next_renewal_date, billing_cycle },
+            todayInWarsaw(new Date()),
+          ),
+        };
   // Never `user_id` or `status`: the edit form changes only these five fields.
   const { data: updated, error: updateError } = await supabase
     .from("subscriptions")
-    .update({
-      name,
-      price,
-      currency,
-      billing_cycle,
-      next_renewal_date: renewalDateToStore(existing, { next_renewal_date, billing_cycle }, todayInWarsaw(new Date())),
-    })
+    .update({ name, price, currency, ...schedule })
     .eq("id", id)
+    // A cancel landing between the select and the update must not have its frozen end date overwritten.
+    .eq("status", existing.status)
     .select("id");
   if (updateError) {
     return context.redirect(formErrorLocation(editPath, "Could not save the subscription", form));

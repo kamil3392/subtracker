@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import { useFormStatus } from "react-dom";
 import { Ban, Trash2 } from "lucide-react";
+import { SubmitButton } from "@/components/form/SubmitButton";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -30,37 +30,6 @@ interface ConfirmActionProps {
   pendingText: string;
   icon: ReactNode;
   destructive?: boolean;
-}
-
-// A separate component so `useFormStatus` reads the enclosing confirmation form (as in `SubmitButton`).
-function ConfirmButton({
-  pendingText,
-  destructive,
-  children,
-}: {
-  pendingText: string;
-  destructive: boolean;
-  children: ReactNode;
-}) {
-  const { pending } = useFormStatus();
-
-  return (
-    <Button
-      type="submit"
-      variant={destructive ? "destructive" : "default"}
-      disabled={pending}
-      className={cn("w-full sm:w-auto", !destructive && "bg-purple-600 text-white hover:bg-purple-500")}
-    >
-      {pending ? (
-        <span className="flex items-center gap-2">
-          <span className="size-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-          {pendingText}
-        </span>
-      ) : (
-        children
-      )}
-    </Button>
-  );
 }
 
 function ConfirmAction({
@@ -97,10 +66,14 @@ function ConfirmAction({
             <AlertDialogCancel className="border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white">
               Keep
             </AlertDialogCancel>
-            <ConfirmButton pendingText={pendingText} destructive={destructive}>
-              {icon}
+            <SubmitButton
+              pendingText={pendingText}
+              icon={icon}
+              variant={destructive ? "destructive" : undefined}
+              className="w-full sm:w-auto"
+            >
               {confirmLabel}
-            </ConfirmButton>
+            </SubmitButton>
           </AlertDialogFooter>
         </form>
       </AlertDialogContent>

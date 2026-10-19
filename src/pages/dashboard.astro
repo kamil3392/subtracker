@@ -11,11 +11,12 @@ import {
   monthlyCostByCurrency,
   upcomingRenewals,
 } from "@/lib/services/subscriptions";
-import { formValuesFromSearchParams } from "@/lib/subscription-form";
+import { FORM_VALUE_MAX_LENGTH, formValuesFromSearchParams } from "@/lib/subscription-form";
 import { createClient } from "@/lib/supabase";
 import type { Subscription } from "@/types";
 
-const error = Astro.url.searchParams.get("error");
+// The query string is user-controlled; cap the message like the carried form values.
+const error = Astro.url.searchParams.get("error")?.slice(0, FORM_VALUE_MAX_LENGTH) ?? null;
 // F6: after a failed add the endpoint carries the typed values back in the query string.
 const carriedValues = error ? formValuesFromSearchParams(Astro.url.searchParams) : undefined;
 // F4: an error without carried fields did not come from `formErrorLocation` (the add form), so it is

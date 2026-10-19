@@ -68,6 +68,11 @@ if (subscription) {
           <p class="rounded-xl border border-red-500/30 bg-red-900/30 px-4 py-3 text-sm text-red-300">{loadError}</p>
         ) : subscription ? (
           <section class="rounded-2xl border border-white/10 bg-white/10 p-6 backdrop-blur-xl">
+            {subscription.status === "cancelled" && (
+              <p class="mb-4 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-blue-100/70">
+                This subscription is cancelled — its end date and billing cycle stay as they are.
+              </p>
+            )}
             <SubscriptionForm
               action={`/api/subscriptions/${subscription.id}`}
               submitLabel="Save changes"

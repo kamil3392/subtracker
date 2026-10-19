@@ -12,7 +12,6 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import type { SubscriptionStatus } from "@/types";
 
 interface Props {
@@ -45,27 +44,20 @@ function ConfirmAction({
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button
-          type="button"
-          size="sm"
-          variant={destructive ? "destructive" : "ghost"}
-          className={cn(!destructive && "text-blue-100/80 hover:bg-white/10 hover:text-white")}
-        >
+        <Button type="button" size="sm" variant={destructive ? "destructive" : "secondary"}>
           {icon}
           {triggerLabel}
         </Button>
       </AlertDialogTrigger>
-      <AlertDialogContent className="border-white/10 bg-slate-900 text-white">
+      <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
-          <AlertDialogDescription className="text-blue-100/70">{description}</AlertDialogDescription>
+          <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         {/* Native POST: the endpoint answers with a redirect, so no fetch and no JSON. */}
         <form method="POST" action={action}>
           <AlertDialogFooter>
-            <AlertDialogCancel className="border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white">
-              Keep
-            </AlertDialogCancel>
+            <AlertDialogCancel>Keep</AlertDialogCancel>
             <SubmitButton
               pendingText={pendingText}
               icon={icon}

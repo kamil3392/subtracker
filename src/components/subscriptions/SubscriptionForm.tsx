@@ -3,6 +3,7 @@ import { CalendarDays, Coins, Plus, Save, Tag } from "lucide-react";
 import { FormField } from "@/components/form/FormField";
 import { SubmitButton } from "@/components/form/SubmitButton";
 import { ServerError } from "@/components/form/ServerError";
+import { Label } from "@/components/ui/label";
 import { Constants } from "@/db/database.types";
 import { BILLING_CYCLE_LABELS, SUPPORTED_CURRENCIES, type SupportedCurrency } from "@/lib/currencies";
 import { RENEWAL_DATE_MAX, RENEWAL_DATE_MIN } from "@/lib/services/dates";
@@ -13,8 +14,9 @@ const MAX_NAME_LENGTH = 100;
 const PRICE_PATTERN = /^\d{1,8}([.,]\d{1,2})?$/;
 const DATE_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
 
+// Native select on the same tokens as `ui/input.tsx` (border, background, focus ring).
 const selectBase =
-  "w-full rounded-lg bg-white/10 border border-white/20 px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-400 transition-colors";
+  "border-input h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-ring focus-visible:ring-3 md:text-sm";
 
 function isCalendarDate(value: string): boolean {
   const match = DATE_PATTERN.exec(value);
@@ -147,9 +149,9 @@ export default function SubscriptionForm({
         />
 
         <div>
-          <label htmlFor="currency" className="mb-1 block text-sm text-blue-100/80">
+          <Label htmlFor="currency" className="mb-1.5">
             Currency
-          </label>
+          </Label>
           <select
             id="currency"
             name="currency"
@@ -160,7 +162,7 @@ export default function SubscriptionForm({
             className={selectBase}
           >
             {SUPPORTED_CURRENCIES.map((code) => (
-              <option key={code} value={code} className="bg-slate-900">
+              <option key={code} value={code}>
                 {code}
               </option>
             ))}
@@ -169,9 +171,9 @@ export default function SubscriptionForm({
       </div>
 
       <div>
-        <label htmlFor="billing_cycle" className="mb-1 block text-sm text-blue-100/80">
+        <Label htmlFor="billing_cycle" className="mb-1.5">
           Billing cycle
-        </label>
+        </Label>
         <select
           id="billing_cycle"
           name="billing_cycle"
@@ -182,7 +184,7 @@ export default function SubscriptionForm({
           className={selectBase}
         >
           {Constants.public.Enums.billing_cycle.map((cycle) => (
-            <option key={cycle} value={cycle} className="bg-slate-900">
+            <option key={cycle} value={cycle}>
               {BILLING_CYCLE_LABELS[cycle]}
             </option>
           ))}

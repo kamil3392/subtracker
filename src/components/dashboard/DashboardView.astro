@@ -1,0 +1,180 @@
+---
+import Topbar from "@/components/Topbar.astro";
+import SubscriptionActions from "@/components/subscriptions/SubscriptionActions";
+import SubscriptionForm from "@/components/subscriptions/SubscriptionForm";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { buttonVariants } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { BILLING_CYCLE_LABELS } from "@/lib/currencies";
+import { formatDate, formatMoney } from "@/lib/format";
+import {
+  countsToward,
+  effectiveRenewalDate,
+  monthlyCostByCurrency,
+  upcomingRenewals,
+} from "@/lib/services/subscriptions";
+import type { Subscription, SubscriptionFormValues } from "@/types";
+
+// Pure view: the page (or a fixture) supplies the data, the view derives the figures it shows.
+interface Props {
+  pageError: string | null;
+  loadError: string | null;
+  subscriptions: Subscription[];
+  today: string;
+  formError: string | null;
+  initialValues: Partial<SubscriptionFormValues> | undefined;
+}
+
+const { pageError, loadError, subscriptions, today, formError, initialValues } = Astro.props;
+
+const costs = monthlyCostByCurrency(subscriptions, today);
+const renewals = upcomingRenewals(subscriptions, today);
+// The empty state means "no entries at all"; entries that no longer count (FR-007) still show the list.
+const isEmpty = subscriptions.length === 0;
+// FR-004: every entry from the rows already loaded (no extra query), sorted by name.
+const allSubscriptions = [...subscriptions].sort((a, b) => a.name.localeCompare(b.name));
+---
+
+<div class="min-h-screen w-full p-4 sm:p-8">
+  <Topbar />
+
+  <div class="mx-auto grid max-w-5xl grid-cols-1 gap-6 py-6 lg:grid-cols-[1fr_22rem]">
+    <div class="min-w-0 space-y-6">
+      {pageError && (
+        <Alert variant="destructive">
+          <AlertDescription>{pageError}</AlertDescription>
+        </Alert>
+      )}
+
+      <h1 class="text-3xl font-bold text-foreground">Your subscriptions</h1>
+
+      {loadError ? (
+        <Alert variant="destructive">
+          <AlertDescription>{loadError}</AlertDescription>
+        </Alert>
+      ) : isEmpty ? (
+        <section>
+          <Card className="text-center">
+            <CardContent>
+              <h2 class="mb-2 text-lg font-semibold">No subscriptions yet</h2>
+              <p class="text-sm text-muted-foreground">
+                Add your first subscription with the form to see your monthly cost and upcoming renewals.
+              </p>
+            </CardContent>
+          </Card>
+        </section>
+      ) : (
+        <>
+          <section>
+            <h2 class="mb-3 text-lg font-semibold">Monthly cost</h2>
+            {costs.length === 0 ? (
+              <p class="rounded-xl border border-border bg-muted px-4 py-3 text-sm text-muted-foreground">
+                No subscriptions count toward your monthly cost right now.
+              </p>
+            ) : (
+              <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                {costs.map(({ currency, monthlyCents }) => (
+                  <Card className="gap-1 py-5">
+                    <CardHeader className="px-5">
+                      <p class="text-sm text-muted-foreground">{currency} per month</p>
+                    </CardHeader>
+                    <CardContent className="px-5">
+                      <p class="text-2xl font-bold">{formatMoney(monthlyCents / 100, currency)}</p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </section>
+
+          <section>
+            <h2 class="mb-3 text-lg font-semibold">Renewals in the next 30 days</h2>
+            {renewals.length === 0 ? (
+              <p class="rounded-xl border border-border bg-muted px-4 py-3 text-sm text-muted-foreground">
+                No renewals in the next 30 days.
+              </p>
+            ) : (
+              <Card className="gap-0 py-0">
+                <ul class="divide-y divide-border">
+                  {renewals.map(({ subscription, renewalDate }) => (
+                    <li class="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
+                      <div>
+                        <p class="font-medium">{subscription.name}</p>
+                        <p class="text-sm text-muted-foreground">
+                          {formatDate(renewalDate)} ·{" "}
+                          {subscription.status === "cancelled"
+                            ? "Cancelled, won't renew"
+                            : BILLING_CYCLE_LABELS[subscription.billing_cycle]}
+                        </p>
+                      </div>
+                      <p class="font-semibold">{formatMoney(subscription.price, subscription.currency)}</p>
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+            )}
+          </section>
+        </>
+      )}
+
+      {!loadError && allSubscriptions.length > 0 && (
+        <section>
+          <h2 class="mb-3 text-lg font-semibold">All subscriptions</h2>
+          <Card className="gap-0 py-0">
+            <ul class="divide-y divide-border">
+              {allSubscriptions.map((subscription) => (
+                <li class="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
+                  <div>
+                    <p class="font-medium">{subscription.name}</p>
+                    <p class="text-sm text-muted-foreground">
+                      {formatMoney(subscription.price, subscription.currency)} ·{" "}
+                      {BILLING_CYCLE_LABELS[subscription.billing_cycle]}
+                    </p>
+                    <p class="text-sm text-muted-foreground">
+                      {subscription.status === "active"
+                        ? `Next renewal: ${formatDate(effectiveRenewalDate(subscription, today))}`
+                        : `Cancelled · ${countsToward(subscription, today) ? "ends" : "ended"} ${formatDate(effectiveRenewalDate(subscription, today))}`}
+                    </p>
+                  </div>
+                  <div class="flex flex-wrap items-center gap-2">
+                    <a
+                      href={`/subscriptions/${subscription.id}/edit`}
+                      class:list={buttonVariants({ variant: "outline", size: "sm" })}
+                    >
+                      Edit
+                    </a>
+                    <SubscriptionActions
+                      id={subscription.id}
+                      name={subscription.name}
+                      status={subscription.status}
+                      client:load
+                    />
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </Card>
+        </section>
+      )}
+    </div>
+
+    <section class="h-fit">
+      <Card>
+        <CardHeader>
+          <h2 class="text-lg leading-none font-semibold">Add subscription</h2>
+        </CardHeader>
+        <CardContent>
+          <SubscriptionForm
+            action="/api/subscriptions"
+            submitLabel="Add subscription"
+            pendingText="Saving..."
+            submitIcon="plus"
+            initialValues={initialValues}
+            serverError={formError}
+            client:load
+          />
+        </CardContent>
+      </Card>
+    </section>
+  </div>
+</div>

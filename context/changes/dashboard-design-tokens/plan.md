@@ -449,11 +449,11 @@ Brak danych do migracji. Wycofanie = revert commitów zmiany; commity faz 3–4 
 
 #### Automated
 
-- [x] 2.1 `grep -nE '#[0-9a-fA-F]{3,8}\b' src/components/Banner.astro` nie zwraca trafień
-- [x] 2.2 `grep -rnE 'ring-(ring|destructive)/[0-9]+' src/components/ui` nie zwraca trafień dla wariantów `focus-visible:`
-- [x] 2.3 Lint przechodzi: `npm run lint`
-- [x] 2.4 Typy przechodzą: `npx astro check`
-- [x] 2.5 Build przechodzi: `npm run build`
+- [x] 2.1 `grep -nE '#[0-9a-fA-F]{3,8}\b' src/components/Banner.astro` nie zwraca trafień — 3099b88
+- [x] 2.2 `grep -rnE 'ring-(ring|destructive)/[0-9]+' src/components/ui` nie zwraca trafień dla wariantów `focus-visible:` — 3099b88
+- [x] 2.3 Lint przechodzi: `npm run lint` — 3099b88
+- [x] 2.4 Typy przechodzą: `npx astro check` — 3099b88
+- [x] 2.5 Build przechodzi: `npm run build` — 3099b88
 
 #### Manual
 
@@ -464,16 +464,16 @@ Brak danych do migracji. Wycofanie = revert commitów zmiany; commity faz 3–4 
 
 #### Automated
 
-- [ ] 3.1 Skan literałów (regex w „Skan”) na `src/pages/dashboard.astro src/components/dashboard/*.astro src/components/Topbar.astro src/components/form/*.tsx src/components/subscriptions/*.tsx` = 0 trafień
-- [ ] 3.2 `grep -n 'bg-cosmic' src/pages/dashboard.astro src/components/dashboard/*.astro` pusty
-- [ ] 3.3 Lint przechodzi: `npm run lint`
-- [ ] 3.4 Typy przechodzą: `npx astro check`
-- [ ] 3.5 Testy przechodzą: `npm test`
-- [ ] 3.6 Build przechodzi: `npm run build`
+- [x] 3.1 Skan literałów (regex w „Skan”) na `src/pages/dashboard.astro src/components/dashboard/*.astro src/components/Topbar.astro src/components/form/*.tsx src/components/subscriptions/*.tsx` = 0 trafień
+- [x] 3.2 `grep -n 'bg-cosmic' src/pages/dashboard.astro src/components/dashboard/*.astro` pusty
+- [x] 3.3 Lint przechodzi: `npm run lint`
+- [x] 3.4 Typy przechodzą: `npx astro check`
+- [x] 3.5 Testy przechodzą: `npm test`
+- [x] 3.6 Build przechodzi: `npm run build`
 
 #### Manual
 
-- [ ] 3.7 Zrzut dashboardu desktop 1280 px i mobile 375 px — jasny, czytelny, bez poziomego scrolla na 375 px
+- [x] 3.7 Zrzut dashboardu desktop 1280 px i mobile 375 px — jasny, czytelny, bez poziomego scrolla na 375 px
 - [ ] 3.8 Dialog Cancel/Delete otwiera się w jasnych tokenach, „Keep” i potwierdzenie czytelne
 
 ### Phase 4: Pozostałe strony
